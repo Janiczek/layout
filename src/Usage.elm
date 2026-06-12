@@ -1,22 +1,15 @@
-module Triangle exposing (main)
+module Usage exposing (main)
 
-{-
-   Rotating triangle, that is a "hello world" of the WebGL
--}
-
-import Browser
-import Browser.Events exposing (onAnimationFrameDelta)
 import Html exposing (Html)
-import Html.Attributes exposing (height, style, width)
-import Json.Decode exposing (Value)
-import Math.Matrix4 as Mat4 exposing (Mat4)
-import Math.Vector3 as Vec3 exposing (Vec3, vec3)
-import WebGL exposing (Mesh, Shader)
-
+import Examples
+import Layout
+import Render
 
 main : Html msg
 main =
-    viewEl ex1
+  Examples.ex1
+  |> Layout.layout
+  |> Render.webgl
 
 
 intent : String
@@ -51,9 +44,6 @@ On closing an element:
 Said more declaratively,
 - parent size along layout axis = Sum of children
 - parent size across layout axis = Max of children
-
-
-
 
 Going down (with children sizes being already done):
   parent width = parent left padding + parent right padding + sum of child widths + (children.length - 1) * parent childGap
@@ -92,154 +82,3 @@ at the same rate until you hit the next largest thing
 
 Need a way to measure text bbox
     """
-
-
-ex1 : El
-ex1 =
-    El
-        [ LayoutDirection TopToBottom
-        , BgColor Purple
-        ]
-        []
-
-
-type alias MenuItem =
-    { label : String
-    , icon : String
-    }
-
-
-ex2 : El
-ex2 =
-    El
-        [ LayoutDirection TopToBottom
-        , BgColor Purple
-        ]
-        ([ MenuItem "Copy" "copy"
-         , MenuItem "Paste" "paste"
-         ]
-            |> List.map viewMenuItem
-        )
-
-
-viewMenuItem : MenuItem -> El
-viewMenuItem item =
-    El
-        [ Width Grow
-        , BgColor LightPurple
-        ]
-        [ Text [ FontSize 18 ] item.label
-        , El [ ImageData item.icon ] []
-        ]
-
-
-ex3 : El
-ex3 =
-    El
-        [ Width (Fixed 960)
-        , Height (Fixed 540)
-        , BgColor Blue
-        , Padding 32 32 32 32
-        , ChildGap 32
-        ]
-        [ El
-            [ Width (Fixed 300)
-            , Height (Fixed 300)
-            , BgColor Pink
-            ]
-            []
-        , El
-            [ Width (Fixed 350)
-            , Height (Fixed 200)
-            , BgColor Yellow
-            ]
-            []
-        ]
-
-
-type El
-    = El (List Attr) (List El)
-    | Text (List TextAttr) String
-    | Empty
-
-
-type Attr
-    = LayoutDirection LayoutDirection
-    | Width Size
-    | Height Size
-    | Padding Int Int Int Int
-    | ChildGap Int
-    | BgColor Color
-    | ImageData String
-    | HorizAlign HorizAlign
-    | VertAlign VertAlign
-
-
-type HorizAlign
-    = Left
-    | HCenter
-    | Right
-
-
-type VertAlign
-    = Top
-    | VCenter
-    | Bottom
-
-
-type LayoutDirection
-    = TopToBottom
-    | {- DEFAULT -} LeftToRight
-
-
-type Size
-    = Fixed Int
-    | {- DEFAULT -} Fit (List SizeAttr)
-    | Grow (List SizeAttr)
-
-
-type SizeAttr
-    = Min Int
-    | Max Int
-
-
-type Color
-    = Purple
-    | LightPurple
-    | Blue
-    | Pink
-    | Yellow
-
-
-type TextAttr
-    = FontSize Int
-
-
-type UIElement
-    = UIElement
-        { position :
-            { x : Float
-            , y : Float
-            }
-        , size :
-            { width : Float
-            , height : Float
-            }
-        , children : List UIElement
-        , bgColor : Color
-        }
-
-
-layout : El -> ()
-layout el =
-    Debug.todo "layout"
-
-
-draw : El -> ()
-draw el =
-    Debug.todo "draw"
-
-
-viewEl : El -> Html msg
-viewEl el =
-    Debug.todo "viewEl"
