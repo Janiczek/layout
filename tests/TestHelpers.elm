@@ -1,4 +1,4 @@
-module TestHelpers exposing (el, elWithMaxDepth, bgColorFromEl)
+module TestHelpers exposing (el, elWithMaxDepth)
 
 import El exposing (..)
 import Fuzz exposing (Fuzzer)
@@ -23,7 +23,7 @@ elWithMaxDepth depth =
             [ textEl
             , emptyEl
             , containerElWithoutChildren
-            , containerEl (Fuzz.list (elWithMaxDepth (depth - 1)))
+            , containerEl (Fuzz.listOfLengthBetween 0 5 (elWithMaxDepth (depth - 1)))
             ]
 
 
@@ -49,7 +49,7 @@ containerEl childrenFuzzer =
 
 attrsFuzzer : Fuzzer (List Attr)
 attrsFuzzer =
-    Fuzz.list attrFuzzer
+    Fuzz.listOfLengthBetween 0 5 attrFuzzer
 
 
 attrFuzzer : Fuzzer Attr
@@ -61,7 +61,6 @@ attrFuzzer =
         , Fuzz.map4 Padding Fuzz.int Fuzz.int Fuzz.int Fuzz.int
         , Fuzz.map ChildGap Fuzz.int
         , Fuzz.map BgColor colorFuzzer
-        , Fuzz.map ImageData Fuzz.string
         , Fuzz.map HorizAlign horizAlignFuzzer
         , Fuzz.map VertAlign vertAlignFuzzer
         ]
@@ -79,8 +78,8 @@ sizeFuzzer : Fuzzer Size
 sizeFuzzer =
     Fuzz.oneOf
         [ Fuzz.map Fixed Fuzz.int
-        , Fuzz.map Fit (Fuzz.list sizeAttrFuzzer)
-        , Fuzz.map Grow (Fuzz.list sizeAttrFuzzer)
+        , Fuzz.map Fit (Fuzz.listOfLengthBetween 0 3 sizeAttrFuzzer)
+        , Fuzz.map Grow (Fuzz.listOfLengthBetween 0 3 sizeAttrFuzzer)
         ]
 
 
@@ -119,29 +118,3 @@ vertAlignFuzzer =
         , VCenter
         , Bottom
         ]
-
-
-bgColorFromEl : El -> Maybe Color
-bgColorFromEl input =
-    case input of
-        Container attrs _ ->
-            findBgColor attrs
-
-        Text _ _ ->
-            Nothing
-
-        Empty ->
-            Nothing
-
-
-findBgColor : List Attr -> Maybe Color
-findBgColor attrs =
-    case attrs of
-        [] ->
-            Nothing
-
-        BgColor color :: _ ->
-            Just color
-
-        _ :: rest ->
-            findBgColor rest

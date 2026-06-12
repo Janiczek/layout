@@ -1,5 +1,6 @@
 module El exposing
-    ( El(..), AnnotatedEl(..)
+    ( El(..)
+    , AnnotatedEl(..), AnnotatedElData
     , Attr(..)
     , LayoutDirection(..)
     , Size(..), SizeAttr(..)
@@ -7,12 +8,14 @@ module El exposing
     , Color(..)
     , TextAttr(..)
     , foldPreOrder, foldPostOrder
+    , preOrder, postOrder
     , annotatedPreOrder, annotatedPostOrder
     )
 
 {-|
 
-@docs El, AnnotatedEl
+@docs El
+@docs AnnotatedEl, AnnotatedElData
 
 @docs Attr
 @docs LayoutDirection
@@ -22,6 +25,7 @@ module El exposing
 @docs TextAttr
 
 @docs foldPreOrder, foldPostOrder
+@docs preOrder, postOrder
 @docs annotatedPreOrder, annotatedPostOrder
 
 -}
@@ -34,20 +38,37 @@ type El
 
 
 type AnnotatedEl
-    = AEl
-        { position :
-            { x : Float
-            , y : Float
-            }
-        , size :
-            { width : Float
-            , height : Float
-            }
-        , children : List AnnotatedEl
-        , bgColor : Maybe Color
+    = AEl AnnotatedElData
 
-        -- TODO: extra data like text string / image etc.
+
+type alias AnnotatedElData =
+    { position :
+        { x : Float
+        , y : Float
         }
+    , size :
+        { width : Float
+        , height : Float
+        }
+    , layoutDirection : LayoutDirection
+    , horizAlign : HorizAlign
+    , vertAlign : VertAlign
+    , children : List AnnotatedEl
+    , bgColor : Maybe Color
+    , fontSize : Maybe Int
+    , childGap : Int
+    , text :
+        -- TODO think about data modeling this Maybe away
+        Maybe String
+    , widthSpec : Size
+    , heightSpec : Size
+    , padding :
+        { top : Int
+        , right : Int
+        , bottom : Int
+        , left : Int
+        }
+    }
 
 
 type Attr
@@ -57,7 +78,6 @@ type Attr
     | Padding Int Int Int Int
     | ChildGap Int
     | BgColor Color
-    | ImageData String
     | HorizAlign HorizAlign
     | VertAlign VertAlign
 
@@ -122,7 +142,7 @@ foldPostOrder : (El -> acc -> acc) -> acc -> El -> acc
 foldPostOrder step acc el =
     case el of
         Container _ children ->
-            step el 
+            step el
                 (List.foldl
                     (\child childAcc -> foldPostOrder step childAcc child)
                     acc
@@ -134,6 +154,16 @@ foldPostOrder step acc el =
 
         Empty ->
             step el acc
+
+
+preOrder : El -> List El
+preOrder el =
+    foldPreOrder (::) [] el
+
+
+postOrder : El -> List El
+postOrder el =
+    foldPostOrder (::) [] el
 
 
 annotatedPreOrder : AnnotatedEl -> List AnnotatedEl
