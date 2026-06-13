@@ -16,17 +16,6 @@ run el =
         |> Step1.fitSizingAlong
 
 
-fixedChild : Int -> Int -> AnnotatedEl
-fixedChild width height =
-    AEl
-        { default
-            | width = width
-            , height = height
-            , widthSpec = SFixed width
-            , heightSpec = SFixed height
-        }
-
-
 suite : Test
 suite =
     Test.describe "Step1.fitSizingAlong"
@@ -34,8 +23,7 @@ suite =
             \() ->
                 Container [] []
                     |> run
-                    |> TestHelpers.expectEqualAnnotatedEl
-                        (AEl default)
+                    |> TestHelpers.expectEqualAnnotatedEl (AEl default)
         , Test.test "fit container -> still 0" <|
             \() ->
                 Container
@@ -44,8 +32,7 @@ suite =
                     ]
                     []
                     |> run
-                    |> TestHelpers.expectEqualAnnotatedEl
-                        (AEl default)
+                    |> TestHelpers.expectEqualAnnotatedEl (AEl default)
         , Test.test "grow container -> still 0" <|
             \() ->
                 Container
@@ -61,7 +48,7 @@ suite =
                                 , widthSpec = SGrow
                             }
                         )
-        , Test.test "fixed container LR -> both fixed dimensions filled" <|
+        , Test.test "fixed container LR -> dims filled" <|
             \() ->
                 Container
                     [ Height (Fixed 123)
@@ -97,7 +84,9 @@ suite =
                         (AEl
                             { default
                                 | width = 456
-                                , children = [ fixedChild 456 123 ]
+                                , children =
+                                    [ AEl { default | width = 456, height = 123, widthSpec = SFixed 456, heightSpec = SFixed 123 }
+                                    ]
                             }
                         )
         , Test.test "fit container with fit child -> both 0" <|
@@ -193,7 +182,9 @@ suite =
                             { default
                                 | width = 200
                                 , childGap = 1
-                                , children = [ fixedChild 200 100 ]
+                                , children =
+                                    [ AEl { default | width = 200, height = 100, widthSpec = SFixed 200, heightSpec = SFixed 100 }
+                                    ]
                             }
                         )
         , Test.test "fit container with two children and gap -> use the gap 1x" <|
@@ -221,8 +212,8 @@ suite =
                                 | width = 401
                                 , childGap = 1
                                 , children =
-                                    [ fixedChild 200 100
-                                    , fixedChild 200 100
+                                    [ AEl { default | width = 200, height = 100, widthSpec = SFixed 200, heightSpec = SFixed 100 }
+                                    , AEl { default | width = 200, height = 100, widthSpec = SFixed 200, heightSpec = SFixed 100 }
                                     ]
                             }
                         )
@@ -253,8 +244,8 @@ suite =
                                 , layoutDirection = TopToBottom
                                 , childGap = 1
                                 , children =
-                                    [ fixedChild 200 100
-                                    , fixedChild 200 100
+                                    [ AEl { default | width = 200, height = 100, widthSpec = SFixed 200, heightSpec = SFixed 100 }
+                                    , AEl { default | width = 200, height = 100, widthSpec = SFixed 200, heightSpec = SFixed 100 }
                                     ]
                             }
                         )
@@ -276,9 +267,9 @@ suite =
                                 | width = 602
                                 , childGap = 1
                                 , children =
-                                    [ fixedChild 200 100
-                                    , fixedChild 200 100
-                                    , fixedChild 200 100
+                                    [ AEl { default | width = 200, height = 100, widthSpec = SFixed 200, heightSpec = SFixed 100 }
+                                    , AEl { default | width = 200, height = 100, widthSpec = SFixed 200, heightSpec = SFixed 100 }
+                                    , AEl { default | width = 200, height = 100, widthSpec = SFixed 200, heightSpec = SFixed 100 }
                                     ]
                             }
                         )

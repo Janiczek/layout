@@ -29,6 +29,8 @@ fitSizingAlong root =
                             -- Do nothing in this step (see Step2)
                             ael_
 
+                -- TODO: it's unclear to me whether this across step needs to be there in Step1.
+                -- See the test "fit container with two children and gap -> use the gap 1x, vertical"
                 aelAcross =
                     case across.getSizeSpec ael_ of
                         SFixed n ->
@@ -43,14 +45,5 @@ fitSizingAlong root =
                             aelAlong
             in
             aelAcross
-         {-
-            |> (\a ->
-                    let
-                        _ =
-                            Debug.log (El.printout a) ""
-                    in
-                    a
-               )
-         -}
         )
         root
