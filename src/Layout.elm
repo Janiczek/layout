@@ -1,6 +1,6 @@
-module Layout exposing (Config, layout)
+module Layout exposing (layout)
 
-import El exposing (AnnotatedEl, El)
+import El exposing (AnnotatedEl, Config, El)
 import Step0Annotate as Step0
 import Step1FitSizingAlong as Step1
 import Step2GrowShrinkSizingAlong as Step2
@@ -8,12 +8,6 @@ import Step3WrapText as Step3
 import Step4FitSizingAcross as Step4
 import Step5GrowShrinkSizingAcross as Step5
 import Step6PositionAndAlign as Step6
-
-
-type alias Config =
-    { layoutWidth : Int
-    , layoutHeight : Int
-    }
 
 
 layout : Config -> El -> AnnotatedEl

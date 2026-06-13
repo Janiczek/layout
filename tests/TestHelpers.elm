@@ -1,7 +1,23 @@
-module TestHelpers exposing (default, el, elWithMaxDepth)
+module TestHelpers exposing (default, el, elWithMaxDepth, expectEqualAnnotatedEl)
 
 import El exposing (..)
+import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer)
+
+
+expectEqualAnnotatedEl : AnnotatedEl -> AnnotatedEl -> Expectation
+expectEqualAnnotatedEl expected actual =
+    actual
+        |> Expect.equal expected
+        |> Expect.onFail
+            ([ "AnnotatedEls not equal:"
+             , "expected"
+             , El.printout actual
+             , "to equal"
+             , El.printout expected
+             ]
+                |> String.join "\n\n"
+            )
 
 
 default : AnnotatedElData

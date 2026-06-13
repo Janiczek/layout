@@ -19,7 +19,7 @@ suite =
                     ]
                     []
                     |> Step0.annotate
-                    |> Expect.equal
+                    |> TestHelpers.expectEqualAnnotatedEl
                         (AEl
                             { default
                                 | bgColor = Just Purple
@@ -48,7 +48,7 @@ suite =
                         ]
                     ]
                     |> Step0.annotate
-                    |> Expect.equal
+                    |> TestHelpers.expectEqualAnnotatedEl
                         (AEl
                             { default
                                 | bgColor = Just Purple
@@ -106,7 +106,7 @@ suite =
                         []
                     ]
                     |> Step0.annotate
-                    |> Expect.equal
+                    |> TestHelpers.expectEqualAnnotatedEl
                         (AEl
                             { default
                                 | bgColor = Just Blue

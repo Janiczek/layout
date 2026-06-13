@@ -34,7 +34,8 @@ suite =
             \() ->
                 Container [] []
                     |> run
-                    |> Expect.equal (AEl default)
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl default)
         , Test.test "fit container -> still 0" <|
             \() ->
                 Container
@@ -43,7 +44,8 @@ suite =
                     ]
                     []
                     |> run
-                    |> Expect.equal (AEl default)
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl default)
         , Test.test "grow container -> still 0" <|
             \() ->
                 Container
@@ -52,7 +54,7 @@ suite =
                     ]
                     []
                     |> run
-                    |> Expect.equal
+                    |> TestHelpers.expectEqualAnnotatedEl
                         (AEl
                             { default
                                 | heightSpec = SGrow
@@ -68,7 +70,7 @@ suite =
                     ]
                     []
                     |> run
-                    |> Expect.equal
+                    |> TestHelpers.expectEqualAnnotatedEl
                         (AEl
                             { default
                                 | width = 456
@@ -91,7 +93,7 @@ suite =
                         []
                     ]
                     |> run
-                    |> Expect.equal
+                    |> TestHelpers.expectEqualAnnotatedEl
                         (AEl
                             { default
                                 | width = 456
@@ -111,7 +113,7 @@ suite =
                         []
                     ]
                     |> run
-                    |> Expect.equal
+                    |> TestHelpers.expectEqualAnnotatedEl
                         (AEl { default | children = [ AEl default ] })
         , Test.test "fit container with padding -> use the padding" <|
             \() ->
@@ -122,7 +124,7 @@ suite =
                     ]
                     []
                     |> run
-                    |> Expect.equal
+                    |> TestHelpers.expectEqualAnnotatedEl
                         (AEl
                             { default
                                 | width = 3 + 7
@@ -141,7 +143,7 @@ suite =
                     ]
                     [ Container [ Padding 20 30 50 70 ] [] ]
                     |> run
-                    |> Expect.equal
+                    |> TestHelpers.expectEqualAnnotatedEl
                         (AEl
                             { default
                                 | width = 3 + 7 + 30 + 70
@@ -170,7 +172,8 @@ suite =
                     ]
                     []
                     |> run
-                    |> Expect.equal (AEl { default | childGap = 1 })
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl { default | childGap = 1 })
         , Test.test "fit container with one children and gap -> don't use the gap" <|
             \() ->
                 Container
@@ -185,7 +188,7 @@ suite =
                         []
                     ]
                     |> run
-                    |> Expect.equal
+                    |> TestHelpers.expectEqualAnnotatedEl
                         (AEl
                             { default
                                 | width = 200
@@ -212,7 +215,7 @@ suite =
                         []
                     ]
                     |> run
-                    |> Expect.equal
+                    |> TestHelpers.expectEqualAnnotatedEl
                         (AEl
                             { default
                                 | width = 401
@@ -243,7 +246,7 @@ suite =
                         []
                     ]
                     |> run
-                    |> Expect.equal
+                    |> TestHelpers.expectEqualAnnotatedEl
                         (AEl
                             { default
                                 | height = 201
@@ -267,7 +270,7 @@ suite =
                     , Container [ Height (Fixed 100), Width (Fixed 200) ] []
                     ]
                     |> run
-                    |> Expect.equal
+                    |> TestHelpers.expectEqualAnnotatedEl
                         (AEl
                             { default
                                 | width = 602

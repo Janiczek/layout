@@ -1,6 +1,7 @@
 module El exposing
     ( El(..)
     , AnnotatedEl(..), AnnotatedElData, empty, printout
+    , Config
     , Attr(..)
     , LayoutDirection(..), axes
     , Size(..), SizeAttr(..), SizeSpec(..)
@@ -9,14 +10,18 @@ module El exposing
     , TextAttr(..)
     , preOrder, postOrder
     , mapPreOrder, mapPostOrder
+    , mapPreOrderWithParent
+    , indexedMapPreOrder
     , foldPreOrder, foldPostOrder
     , mapAccumPreOrder, mapAccumPostOrder
+    , example
     )
 
 {-|
 
 @docs El
 @docs AnnotatedEl, AnnotatedElData, empty, AnnotatedElPrintout, printout
+@docs Config
 
 @docs Attr
 @docs LayoutDirection, axes
@@ -27,6 +32,8 @@ module El exposing
 
 @docs preOrder, postOrder
 @docs mapPreOrder, mapPostOrder
+@docs mapPreOrderWithParent
+@docs indexedMapPreOrder
 @docs foldPreOrder, foldPostOrder
 @docs mapAccumPreOrder, mapAccumPostOrder
 
@@ -154,22 +161,83 @@ postOrder el =
     foldPostOrder (::) [] el
 
 
+{-| Run function on every AnnotatedEl in this tree.
+Depth-first pre-order: root is done before the children are done.
+-}
 mapPreOrder : (AnnotatedEl -> AnnotatedEl) -> AnnotatedEl -> AnnotatedEl
 mapPreOrder fn root =
     let
         (AEl root_) =
             fn root
     in
-    AEl { root_ | children = List.map fn root_.children }
+    AEl { root_ | children = List.map (mapPreOrder fn) root_.children }
 
 
+{-| Run function on every AnnotatedEl in this tree.
+Depth-first post-order: children are done before the root is done.
+-}
 mapPostOrder : (AnnotatedEl -> AnnotatedEl) -> AnnotatedEl -> AnnotatedEl
 mapPostOrder fn (AEl root) =
     let
         root_ =
-            { root | children = List.map fn root.children }
+            { root | children = List.map (mapPostOrder fn) root.children }
     in
     fn (AEl root_)
+
+
+{-| Run function on every AnnotatedEl in this tree.
+Depth-first pre-order: root is done before the children are done.
+Gives the function the parent AnnotatedEl as well (Nothing = root)
+-}
+mapPreOrderWithParent : (Maybe AnnotatedEl -> AnnotatedEl -> AnnotatedEl) -> AnnotatedEl -> AnnotatedEl
+mapPreOrderWithParent fn root =
+    let
+        aux : Maybe AnnotatedEl -> AnnotatedEl -> AnnotatedEl
+        aux parent el =
+            let
+                (AEl el_) =
+                    fn parent el
+
+                children =
+                    el_.children
+                        |> List.map (aux (Just root))
+            in
+            AEl { el_ | children = children }
+    in
+    aux Nothing root
+
+
+{-| Run function on every AnnotatedEl in this tree.
+Depth-first pre-order: root is done before the children are done.
+Gives the function the index of the item (0 = root)
+-}
+indexedMapPreOrder : (Int -> AnnotatedEl -> AnnotatedEl) -> AnnotatedEl -> AnnotatedEl
+indexedMapPreOrder fn root =
+    let
+        aux : Int -> AnnotatedEl -> ( AnnotatedEl, Int )
+        aux index el =
+            let
+                (AEl root_) =
+                    fn index root
+
+                ( children, newIndex ) =
+                    List.foldl
+                        (\child ( accChildren, accIndex ) ->
+                            let
+                                ( newChild, newAccIndex ) =
+                                    aux accIndex child
+                            in
+                            ( newChild :: accChildren, newAccIndex )
+                        )
+                        ( [], index + 1 )
+                        root_.children
+            in
+            ( AEl { root_ | children = children }
+            , newIndex
+            )
+    in
+    aux 0 root
+        |> Tuple.first
 
 
 mapAccumPreOrder : (AnnotatedEl -> acc -> ( acc, AnnotatedEl )) -> acc -> AnnotatedEl -> ( acc, AnnotatedEl )
@@ -214,6 +282,12 @@ mapAccumPostOrder fn acc ((AEl root) as root_) =
     ( acc__, AEl { root__ | children = children } )
 
 
+type alias Config =
+    { layoutWidth : Int
+    , layoutHeight : Int
+    }
+
+
 
 -- Axis
 
@@ -222,6 +296,7 @@ type alias Axis =
     { sizeSpec : SizeSpec
     , getSize : AnnotatedEl -> Int
     , setSize : Int -> AnnotatedEl -> AnnotatedEl
+    , getLayoutSize : Config -> Int
     , paddingStart : Int
     , paddingEnd : Int
     }
@@ -232,6 +307,7 @@ horizAxis ael =
     { sizeSpec = ael.widthSpec
     , getSize = \(AEl ael2) -> ael2.width
     , setSize = \w (AEl ael2) -> AEl { ael2 | width = max 0 w }
+    , getLayoutSize = .layoutWidth
     , paddingStart = ael.paddingLeft
     , paddingEnd = ael.paddingRight
     }
@@ -242,6 +318,7 @@ vertAxis ael =
     { sizeSpec = ael.heightSpec
     , getSize = \(AEl ael2) -> ael2.height
     , setSize = \h (AEl ael2) -> AEl { ael2 | height = max 0 h }
+    , getLayoutSize = .layoutHeight
     , paddingStart = ael.paddingTop
     , paddingEnd = ael.paddingBottom
     }
@@ -361,7 +438,15 @@ printout (AEl ael) =
     , diff "y" .y String.fromInt
     , diff "width" .width String.fromInt
     , diff "height" .height String.fromInt
-    , diff "children" .children (\ch -> String.fromInt (List.length ch) ++ "x")
+    , diff "children"
+        .children
+        (\ch ->
+            "\n"
+                ++ (ch
+                        |> List.map (\child -> printout child |> indent 4)
+                        |> String.join ",\n"
+                   )
+        )
     , diff "layoutDirection"
         .layoutDirection
         (\ld ->
@@ -433,3 +518,29 @@ printout (AEl ael) =
         |> List.map (\s -> "  " ++ s)
         |> String.join "\n"
         |> (\s -> positionAndSize ++ " [\n" ++ s ++ "\n]")
+
+
+indent : Int -> String -> String
+indent n str =
+    str
+        |> String.lines
+        |> List.map (\s -> String.repeat n " " ++ s)
+        |> String.join "\n"
+
+
+example : AnnotatedEl
+example =
+    AEl
+        { empty
+            | heightSpec = SFixed 300
+            , widthSpec = SFixed 200
+            , width = 300
+            , height = 200
+            , children =
+                [ AEl
+                    { empty
+                        | widthSpec = SGrow
+                        , width = 300
+                    }
+                ]
+        }
