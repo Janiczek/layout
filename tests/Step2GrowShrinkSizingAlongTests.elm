@@ -132,4 +132,58 @@ suite =
                                     ]
                             }
                         )
+        , Test.test "grow example from video" <|
+            \() ->
+                Container
+                    [ Width (Fixed 1600)
+                    , Padding 32 32 32 32
+                    , ChildGap 32
+                    ]
+                    [ Container
+                        [ Width (Fixed 300)
+                        , Height (Fixed 300)
+                        ]
+                        []
+                    , Container
+                        [ Width (Grow [])
+                        , Height (Fixed 200)
+                        ]
+                        []
+                    , Container
+                        [ Width (Fixed 300)
+                        , Height (Fixed 300)
+                        ]
+                        []
+                    ]
+                    |> run
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | widthSpec = SFixed 1600
+                                , width = 1600
+                                , children =
+                                    [ AEl
+                                        { default
+                                            | widthSpec = SFixed 300
+                                            , heightSpec = SFixed 300
+                                            , width = 300
+                                            , height = 300
+                                        }
+                                    , AEl
+                                        { default
+                                            | widthSpec = SGrow
+                                            , heightSpec = SFixed 200
+                                            , width = 872
+                                            , height = 200
+                                        }
+                                    , AEl
+                                        { default
+                                            | widthSpec = SFixed 300
+                                            , heightSpec = SFixed 300
+                                            , width = 300
+                                            , height = 300
+                                        }
+                                    ]
+                            }
+                        )
         ]
