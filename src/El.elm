@@ -3,7 +3,8 @@ module El exposing
     , AnnotatedEl(..), AnnotatedElData, empty, printout
     , Config
     , Attr(..)
-    , LayoutDirection(..), axes
+    , LayoutDirection(..)
+    , Axis, axes
     , Size(..), SizeAttr(..), SizeSpec(..)
     , HorizAlign(..), VertAlign(..)
     , Color(..)
@@ -14,7 +15,6 @@ module El exposing
     , indexedMapPreOrder
     , foldPreOrder, foldPostOrder
     , mapAccumPreOrder, mapAccumPostOrder
-    , example
     )
 
 {-|
@@ -24,7 +24,8 @@ module El exposing
 @docs Config
 
 @docs Attr
-@docs LayoutDirection, axes
+@docs LayoutDirection
+@docs Axis, axes
 @docs Size, SizeAttr, SizeSpec
 @docs HorizAlign, VertAlign
 @docs Color
@@ -297,8 +298,8 @@ type alias Axis =
     , getSize : AnnotatedEl -> Int
     , setSize : Int -> AnnotatedEl -> AnnotatedEl
     , getLayoutSize : Config -> Int
-    , paddingStart : Int
-    , paddingEnd : Int
+    , getPaddingStart : AnnotatedEl -> Int
+    , getPaddingEnd : AnnotatedEl -> Int
     }
 
 
@@ -308,8 +309,8 @@ horizAxis ael =
     , getSize = \(AEl ael2) -> ael2.width
     , setSize = \w (AEl ael2) -> AEl { ael2 | width = max 0 w }
     , getLayoutSize = .layoutWidth
-    , paddingStart = ael.paddingLeft
-    , paddingEnd = ael.paddingRight
+    , getPaddingStart = \(AEl ael2) -> ael2.paddingLeft
+    , getPaddingEnd = \(AEl ael2) -> ael2.paddingRight
     }
 
 
@@ -319,8 +320,8 @@ vertAxis ael =
     , getSize = \(AEl ael2) -> ael2.height
     , setSize = \h (AEl ael2) -> AEl { ael2 | height = max 0 h }
     , getLayoutSize = .layoutHeight
-    , paddingStart = ael.paddingTop
-    , paddingEnd = ael.paddingBottom
+    , getPaddingStart = \(AEl ael2) -> ael2.paddingTop
+    , getPaddingEnd = \(AEl ael2) -> ael2.paddingBottom
     }
 
 
@@ -526,21 +527,3 @@ indent n str =
         |> String.lines
         |> List.map (\s -> String.repeat n " " ++ s)
         |> String.join "\n"
-
-
-example : AnnotatedEl
-example =
-    AEl
-        { empty
-            | heightSpec = SFixed 300
-            , widthSpec = SFixed 200
-            , width = 300
-            , height = 200
-            , children =
-                [ AEl
-                    { empty
-                        | widthSpec = SGrow
-                        , width = 300
-                    }
-                ]
-        }

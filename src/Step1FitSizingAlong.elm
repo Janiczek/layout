@@ -20,8 +20,8 @@ fitSizingAlong root =
                             ael_
                                 |> along.setSize
                                     (List.sum (List.map along.getSize ael.children)
-                                        + along.paddingStart
-                                        + along.paddingEnd
+                                        + along.getPaddingStart ael_
+                                        + along.getPaddingEnd ael_
                                         + {- TODO PERF count them once in Step 0 -} (max 0 (List.length ael.children - 1) * ael.childGap)
                                     )
 

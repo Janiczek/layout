@@ -5,8 +5,6 @@ import El exposing (..)
 
 growShrinkSizingAlong : Config -> AnnotatedEl -> AnnotatedEl
 growShrinkSizingAlong c root =
-    -- TODO: go from root up (preOrder)
-    -- TODO: if it's a Grow, ... TODO
     El.mapPreOrderWithParent
         (\maybeParent ((AEl ael) as ael_) ->
             let
@@ -29,6 +27,17 @@ growShrinkSizingAlong c root =
 
                         Just parent ->
                             ael_
-                                |> along.setSize (along.getSize parent)
+                                |> along.setSize (availableSize along parent)
         )
         root
+
+
+availableSize : Axis -> AnnotatedEl -> Int
+availableSize along ((AEl parent_) as parent) =
+    along.getSize parent
+        - along.getPaddingStart parent
+        - along.getPaddingEnd parent
+        - -- TODO perf children count
+          -- TODO extract the fencepost formula?
+          ((List.length parent_.children - 1) * parent_.childGap)
+        - List.sum (List.map along.getSize parent_.children)

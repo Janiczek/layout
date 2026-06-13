@@ -161,6 +161,11 @@ suite =
                             { default
                                 | widthSpec = SFixed 1600
                                 , width = 1600
+                                , paddingLeft = 32
+                                , paddingRight = 32
+                                , paddingTop = 32
+                                , paddingBottom = 32
+                                , childGap = 32
                                 , children =
                                     [ AEl
                                         { default
