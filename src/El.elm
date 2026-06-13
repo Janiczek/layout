@@ -1,6 +1,6 @@
 module El exposing
     ( El(..)
-    , AnnotatedEl(..), AnnotatedElData, empty
+    , AnnotatedEl(..), AnnotatedElData, empty, printout
     , Attr(..)
     , LayoutDirection(..), axes
     , Size(..), SizeAttr(..), SizeSpec(..)
@@ -16,7 +16,7 @@ module El exposing
 {-|
 
 @docs El
-@docs AnnotatedEl, AnnotatedElData, empty
+@docs AnnotatedEl, AnnotatedElData, empty, AnnotatedElPrintout, printout
 
 @docs Attr
 @docs LayoutDirection, axes
@@ -44,8 +44,8 @@ type AnnotatedEl
 
 
 type alias AnnotatedElData =
-    { x : Float
-    , y : Float
+    { x : Int
+    , y : Int
     , width : Int
     , height : Int
     , layoutDirection : LayoutDirection
@@ -231,7 +231,7 @@ horizAxis : AnnotatedElData -> Axis
 horizAxis ael =
     { sizeSpec = ael.widthSpec
     , getSize = \(AEl ael2) -> ael2.width
-    , setSize = \w (AEl ael2) -> AEl { ael2 | width = w }
+    , setSize = \w (AEl ael2) -> AEl { ael2 | width = max 0 w }
     , paddingStart = ael.paddingLeft
     , paddingEnd = ael.paddingRight
     }
@@ -241,7 +241,7 @@ vertAxis : AnnotatedElData -> Axis
 vertAxis ael =
     { sizeSpec = ael.heightSpec
     , getSize = \(AEl ael2) -> ael2.height
-    , setSize = \h (AEl ael2) -> AEl { ael2 | height = h }
+    , setSize = \h (AEl ael2) -> AEl { ael2 | height = max 0 h }
     , paddingStart = ael.paddingTop
     , paddingEnd = ael.paddingBottom
     }
@@ -290,3 +290,146 @@ empty =
     , fontSize = Nothing
     , text = Nothing
     }
+
+
+printout : AnnotatedEl -> String
+printout (AEl ael) =
+    let
+        positionAndSize : String
+        positionAndSize =
+            String.fromInt ael.width
+                ++ "x"
+                ++ String.fromInt ael.height
+                ++ " @ "
+                ++ String.fromInt ael.x
+                ++ ","
+                ++ String.fromInt ael.y
+
+        diff : String -> (AnnotatedElData -> a) -> (a -> String) -> Maybe String
+        diff label get format =
+            let
+                got : a
+                got =
+                    get ael
+            in
+            if got == get empty then
+                Nothing
+
+            else
+                Just (label ++ ": " ++ format got)
+
+        sizeSpecToString : ( SizeSpec, Maybe Int, Maybe Int ) -> String
+        sizeSpecToString ( ss, min, max ) =
+            let
+                common label =
+                    label
+                        ++ (case min of
+                                Nothing ->
+                                    ""
+
+                                Just min_ ->
+                                    " (min: " ++ String.fromInt min_ ++ ")"
+                           )
+                        ++ (case max of
+                                Nothing ->
+                                    ""
+
+                                Just max_ ->
+                                    " (max: " ++ String.fromInt max_ ++ ")"
+                           )
+            in
+            case ss of
+                SFixed n ->
+                    "Fixed " ++ String.fromInt n
+
+                SFit ->
+                    common "Fit"
+
+                SGrow ->
+                    common "Grow"
+
+        maybe : (a -> String) -> Maybe a -> String
+        maybe fn mb =
+            case mb of
+                Nothing ->
+                    "Nothing"
+
+                Just a ->
+                    fn a
+    in
+    [ diff "x" .x String.fromInt
+    , diff "y" .y String.fromInt
+    , diff "width" .width String.fromInt
+    , diff "height" .height String.fromInt
+    , diff "children" .children (\ch -> String.fromInt (List.length ch) ++ "x")
+    , diff "layoutDirection"
+        .layoutDirection
+        (\ld ->
+            case ld of
+                LeftToRight ->
+                    "LeftToRight"
+
+                TopToBottom ->
+                    "TopToBottom"
+        )
+    , diff "horizAlign"
+        .horizAlign
+        (\ha ->
+            case ha of
+                Left ->
+                    "Left"
+
+                HCenter ->
+                    "HCenter"
+
+                Right ->
+                    "Right"
+        )
+    , diff "vertAlign"
+        .vertAlign
+        (\va ->
+            case va of
+                Top ->
+                    "Top"
+
+                VCenter ->
+                    "VCenter"
+
+                Bottom ->
+                    "Bottom"
+        )
+    , diff "widthSpec" (\ael_ -> ( ael_.widthSpec, ael_.widthMin, ael_.widthMax )) sizeSpecToString
+    , diff "heightSpec" (\ael_ -> ( ael_.heightSpec, ael_.heightMin, ael_.heightMax )) sizeSpecToString
+    , diff "paddingTop" .paddingTop String.fromInt
+    , diff "paddingRight" .paddingRight String.fromInt
+    , diff "paddingBottom" .paddingBottom String.fromInt
+    , diff "paddingLeft" .paddingLeft String.fromInt
+    , diff "childGap" .childGap String.fromInt
+    , diff "bgColor"
+        .bgColor
+        (maybe
+            (\c ->
+                case c of
+                    Blue ->
+                        "Blue"
+
+                    Yellow ->
+                        "Yellow"
+
+                    Purple ->
+                        "Purple"
+
+                    LightPurple ->
+                        "LightPurple"
+
+                    Pink ->
+                        "Pink"
+            )
+        )
+    , diff "fontSize" .fontSize (maybe String.fromInt)
+    , diff "text" .text (maybe (\s -> "\"" ++ s ++ "\""))
+    ]
+        |> List.filterMap identity
+        |> List.map (\s -> "  " ++ s)
+        |> String.join "\n"
+        |> (\s -> positionAndSize ++ " [\n" ++ s ++ "\n]")

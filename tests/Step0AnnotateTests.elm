@@ -5,7 +5,7 @@ import Expect
 import Fuzz
 import Step0Annotate as Step0
 import Test exposing (Test)
-import TestHelpers exposing (default, el)
+import TestHelpers exposing (default)
 
 
 suite : Test
@@ -133,7 +133,7 @@ suite =
                                     ]
                             }
                         )
-        , Test.fuzz el "position and size are zero" <|
+        , Test.fuzz TestHelpers.el "position and size are zero" <|
             \input ->
                 input
                     |> Step0.annotate
@@ -141,8 +141,8 @@ suite =
                     |> List.all isZeroed
                     |> Expect.equal True
 
-        -- TODO test that the attr properties are preserved?
-        , Test.fuzz (Fuzz.list el) "tree structure is preserved" <|
+        -- TODO properties are preserved (except for padding, childGap which are non-negative)
+        , Test.fuzz (Fuzz.list TestHelpers.el) "tree structure is preserved" <|
             \children ->
                 let
                     el =

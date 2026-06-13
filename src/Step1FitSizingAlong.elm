@@ -5,8 +5,6 @@ import El exposing (..)
 
 fitSizingAlong : AnnotatedEl -> AnnotatedEl
 fitSizingAlong root =
-    -- TODO: childGap
-    -- TODO: use max of child sizes across the axis (or is this for step 4?)
     El.mapPostOrder
         (\((AEl ael) as ael_) ->
             let
@@ -45,5 +43,14 @@ fitSizingAlong root =
                             aelAlong
             in
             aelAcross
+         {-
+            |> (\a ->
+                    let
+                        _ =
+                            Debug.log (El.printout a) ""
+                    in
+                    a
+               )
+         -}
         )
         root

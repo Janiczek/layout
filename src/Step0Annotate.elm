@@ -49,7 +49,7 @@ applyAttr attr el =
         Height size ->
             case size of
                 Fixed n ->
-                    { el | heightSpec = SFixed n }
+                    { el | heightSpec = SFixed (max 0 n) }
 
                 Fit attrs ->
                     List.foldl
@@ -65,14 +65,14 @@ applyAttr attr el =
 
         Padding t r b l ->
             { el
-                | paddingTop = t
-                , paddingRight = r
-                , paddingBottom = b
-                , paddingLeft = l
+                | paddingTop = max 0 t
+                , paddingRight = max 0 r
+                , paddingBottom = max 0 b
+                , paddingLeft = max 0 l
             }
 
         ChildGap gap ->
-            { el | childGap = gap }
+            { el | childGap = max 0 gap }
 
         BgColor color ->
             { el | bgColor = Just color }
@@ -95,17 +95,17 @@ applyWidthSizeAttr : SizeAttr -> AnnotatedElData -> AnnotatedElData
 applyWidthSizeAttr attr el =
     case attr of
         Min n ->
-            { el | widthMin = Just n }
+            { el | widthMin = Just (max 0 n) }
 
         Max n ->
-            { el | widthMax = Just n }
+            { el | widthMax = Just (max 0 n) }
 
 
 applyHeightSizeAttr : SizeAttr -> AnnotatedElData -> AnnotatedElData
 applyHeightSizeAttr attr el =
     case attr of
         Min n ->
-            { el | heightMin = Just n }
+            { el | heightMin = Just (max 0 n) }
 
         Max n ->
-            { el | heightMax = Just n }
+            { el | heightMax = Just (max 0 n) }

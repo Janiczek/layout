@@ -30,12 +30,7 @@ fixedChild width height =
 suite : Test
 suite =
     Test.describe "Step1.fitSizingAlong"
-        [ -- TODO fuzz: sets fixed on both axes
-          -- TODO fuzz: fit only sets along
-          -- TODO fuzz: grow doesn't set anything
-          -- TODO fuzz: padding
-          -- TODO fuzz: child gap (fencepost rule)
-          Test.test "default container -> still 0" <|
+        [ Test.test "default container -> still 0" <|
             \() ->
                 Container [] []
                     |> run
@@ -267,21 +262,9 @@ suite =
                     , Width (Fit [])
                     , ChildGap 1
                     ]
-                    [ Container
-                        [ Height (Fixed 100)
-                        , Width (Fixed 200)
-                        ]
-                        []
-                    , Container
-                        [ Height (Fixed 100)
-                        , Width (Fixed 200)
-                        ]
-                        []
-                    , Container
-                        [ Height (Fixed 100)
-                        , Width (Fixed 200)
-                        ]
-                        []
+                    [ Container [ Height (Fixed 100), Width (Fixed 200) ] []
+                    , Container [ Height (Fixed 100), Width (Fixed 200) ] []
+                    , Container [ Height (Fixed 100), Width (Fixed 200) ] []
                     ]
                     |> run
                     |> Expect.equal
@@ -296,4 +279,98 @@ suite =
                                     ]
                             }
                         )
+        , Test.fuzz3 TestHelpers.el Fuzz.int Fuzz.int "fixed -> set on both axes" <|
+            \el w h ->
+                Container
+                    [ Width (Fixed w)
+                    , Height (Fixed h)
+                    ]
+                    []
+                    |> run
+                    |> rootWidthAndHeight
+                    |> Expect.equal ( max 0 w, max 0 h )
+        , Test.fuzz2 Fuzz.int Fuzz.int "fit -> set only along - LR" <|
+            \w h ->
+                Container
+                    [ Width (Fit [])
+                    , Height (Fit [])
+                    , LayoutDirection LeftToRight
+                    ]
+                    [ Container
+                        [ Width (Fixed w)
+                        , Height (Fixed h)
+                        ]
+                        []
+                    ]
+                    |> run
+                    |> rootWidthAndHeight
+                    |> Expect.equal ( max 0 w, 0 )
+        , Test.fuzz2 Fuzz.int Fuzz.int "fit -> set only along - TB" <|
+            \w h ->
+                Container
+                    [ Width (Fit [])
+                    , Height (Fit [])
+                    , LayoutDirection TopToBottom
+                    ]
+                    [ Container
+                        [ Width (Fixed w)
+                        , Height (Fixed h)
+                        ]
+                        []
+                    ]
+                    |> run
+                    |> rootWidthAndHeight
+                    |> Expect.equal ( 0, max 0 h )
+        , Test.fuzz TestHelpers.el "fit - parent.sizeAlong >= child.sizeAlong" <|
+            \el ->
+                let
+                    badRootsAndChildren : List ( String, String )
+                    badRootsAndChildren =
+                        el
+                            |> run
+                            |> El.postOrder
+                            |> List.concatMap
+                                (\((AEl root) as root_) ->
+                                    let
+                                        { along } =
+                                            El.axes root_
+                                    in
+                                    root.children
+                                        |> List.filterMap
+                                            (\((AEl child) as child_) ->
+                                                if
+                                                    (along.sizeSpec /= SFit)
+                                                        || (along.getSize root_ >= along.getSize child_)
+                                                then
+                                                    Nothing
+
+                                                else
+                                                    Just ( El.printout root_, El.printout child_ )
+                                            )
+                                )
+                in
+                (badRootsAndChildren == [])
+                    |> Expect.equal True
+                    |> Expect.onFail
+                        ("Bad parents and children:\n\n"
+                            ++ (badRootsAndChildren
+                                    |> List.map (\( parent, child ) -> "Parent:\n" ++ parent ++ "\n\nChild:\n" ++ child)
+                                    |> String.join "\n\n"
+                               )
+                        )
+
+        -- TODO fuzz: grow doesn't set anything
+        -- TODO fuzz: padding
+        -- TODO fuzz: child gap (fencepost rule)
+        -- TODO fuzz and unit: Fit with min()
+        -- TODO fuzz and unit: Fit with max()
+        -- TODO fuzz and unit: Fit with min(), max()
+        -- TODO fuzz and unit: Grow with min()
+        -- TODO fuzz and unit: Grow with max()
+        -- TODO fuzz and unit: Grow with min(), max()
         ]
+
+
+rootWidthAndHeight : AnnotatedEl -> ( Int, Int )
+rootWidthAndHeight (AEl ael) =
+    ( ael.width, ael.height )
