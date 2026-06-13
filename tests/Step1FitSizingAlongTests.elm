@@ -342,7 +342,7 @@ suite =
                                         |> List.filterMap
                                             (\((AEl child) as child_) ->
                                                 if
-                                                    (along.sizeSpec /= SFit)
+                                                    (along.getSizeSpec root_ /= SFit)
                                                         || (along.getSize root_ >= along.getSize child_)
                                                 then
                                                     Nothing

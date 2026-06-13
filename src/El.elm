@@ -294,7 +294,7 @@ type alias Config =
 
 
 type alias Axis =
-    { sizeSpec : SizeSpec
+    { getSizeSpec : AnnotatedEl -> SizeSpec
     , getSize : AnnotatedEl -> Int
     , setSize : Int -> AnnotatedEl -> AnnotatedEl
     , getLayoutSize : Config -> Int
@@ -305,24 +305,29 @@ type alias Axis =
 
 horizAxis : AnnotatedElData -> Axis
 horizAxis ael =
-    { sizeSpec = ael.widthSpec
-    , getSize = \(AEl ael2) -> ael2.width
+    { getSizeSpec = inner .widthSpec
+    , getSize = inner .width
     , setSize = \w (AEl ael2) -> AEl { ael2 | width = max 0 w }
     , getLayoutSize = .layoutWidth
-    , getPaddingStart = \(AEl ael2) -> ael2.paddingLeft
-    , getPaddingEnd = \(AEl ael2) -> ael2.paddingRight
+    , getPaddingStart = inner .paddingLeft
+    , getPaddingEnd = inner .paddingRight
     }
 
 
 vertAxis : AnnotatedElData -> Axis
 vertAxis ael =
-    { sizeSpec = ael.heightSpec
-    , getSize = \(AEl ael2) -> ael2.height
+    { getSizeSpec = inner .heightSpec
+    , getSize = inner .height
     , setSize = \h (AEl ael2) -> AEl { ael2 | height = max 0 h }
     , getLayoutSize = .layoutHeight
-    , getPaddingStart = \(AEl ael2) -> ael2.paddingTop
-    , getPaddingEnd = \(AEl ael2) -> ael2.paddingBottom
+    , getPaddingStart = inner .paddingTop
+    , getPaddingEnd = inner .paddingBottom
     }
+
+
+inner : (AnnotatedElData -> a) -> AnnotatedEl -> a
+inner fn (AEl ael) =
+    fn ael
 
 
 axes : AnnotatedEl -> { along : Axis, across : Axis }
@@ -513,12 +518,18 @@ printout (AEl ael) =
             )
         )
     , diff "fontSize" .fontSize (maybe String.fromInt)
-    , diff "text" .text (maybe (\s -> "\"" ++ s ++ "\""))
+    , diff "text" .text (maybe printoutText)
     ]
         |> List.filterMap identity
         |> List.map (\s -> "  " ++ s)
         |> String.join "\n"
         |> (\s -> positionAndSize ++ " [\n" ++ s ++ "\n]")
+
+
+printoutText : String -> String
+printoutText s =
+    ("\n\"\"\"\n" ++ s ++ "\n\"\"\"")
+        |> indent 4
 
 
 indent : Int -> String -> String

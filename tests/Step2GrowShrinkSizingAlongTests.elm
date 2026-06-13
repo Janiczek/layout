@@ -23,7 +23,7 @@ run el =
 
 suite : Test
 suite =
-    Test.describe "Step1.fitSizingAlong"
+    Test.describe "Step2.growShrinkSizingAlong"
         [ Test.test "default container -> still 0" <|
             \() ->
                 Container [] []

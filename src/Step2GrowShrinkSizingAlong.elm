@@ -8,10 +8,10 @@ growShrinkSizingAlong c root =
     El.mapPreOrderWithParent
         (\maybeParent ((AEl ael) as ael_) ->
             let
-                { along, across } =
+                { along } =
                     El.axes ael_
             in
-            case along.sizeSpec of
+            case along.getSizeSpec ael_ of
                 SFixed n ->
                     ael_
 

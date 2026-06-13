@@ -12,7 +12,7 @@ fitSizingAlong root =
                     El.axes ael_
 
                 aelAlong =
-                    case along.sizeSpec of
+                    case along.getSizeSpec ael_ of
                         SFixed n ->
                             ael_ |> along.setSize n
 
@@ -30,7 +30,7 @@ fitSizingAlong root =
                             ael_
 
                 aelAcross =
-                    case across.sizeSpec of
+                    case across.getSizeSpec ael_ of
                         SFixed n ->
                             aelAlong |> across.setSize n
 
