@@ -1,11 +1,12 @@
 module Step1FitSizingAlongTests exposing (suite)
 
 import El exposing (..)
-import Expect exposing (Expectation)
-import Fuzz exposing (Fuzzer)
+import Expect
+import Fuzz
 import Step0Annotate as Step0
 import Step1FitSizingAlong as Step1
 import Test exposing (Test)
+import TestHelpers exposing (default)
 
 
 run : El -> AnnotatedEl
@@ -15,39 +16,30 @@ run el =
         |> Step1.fitSizingAlong
 
 
+fixedChild : Int -> Int -> AnnotatedEl
+fixedChild width height =
+    AEl
+        { default
+            | width = width
+            , height = height
+            , widthSpec = SFixed width
+            , heightSpec = SFixed height
+        }
+
+
 suite : Test
 suite =
     Test.describe "Step1.fitSizingAlong"
-        [ Test.test "default container -> still 0" <|
+        [ -- TODO fuzz: sets fixed on both axes
+          -- TODO fuzz: fit only sets along
+          -- TODO fuzz: grow doesn't set anything
+          -- TODO fuzz: padding
+          -- TODO fuzz: child gap (fencepost rule)
+          Test.test "default container -> still 0" <|
             \() ->
                 Container [] []
                     |> run
-                    |> Expect.equal
-                        (AEl
-                            { x = 0
-                            , y = 0
-                            , width = 0
-                            , height = 0
-                            , bgColor = Nothing
-                            , children = []
-                            , childGap = 0
-                            , fontSize = Nothing
-                            , heightSpec = SFit
-                            , heightMin = Nothing
-                            , heightMax = Nothing
-                            , widthSpec = SFit
-                            , widthMin = Nothing
-                            , widthMax = Nothing
-                            , horizAlign = HCenter
-                            , vertAlign = VCenter
-                            , text = Nothing
-                            , layoutDirection = LeftToRight
-                            , paddingTop = 0
-                            , paddingRight = 0
-                            , paddingBottom = 0
-                            , paddingLeft = 0
-                            }
-                        )
+                    |> Expect.equal (AEl default)
         , Test.test "fit container -> still 0" <|
             \() ->
                 Container
@@ -56,32 +48,7 @@ suite =
                     ]
                     []
                     |> run
-                    |> Expect.equal
-                        (AEl
-                            { x = 0
-                            , y = 0
-                            , width = 0
-                            , height = 0
-                            , bgColor = Nothing
-                            , children = []
-                            , childGap = 0
-                            , fontSize = Nothing
-                            , heightSpec = SFit
-                            , heightMin = Nothing
-                            , heightMax = Nothing
-                            , widthSpec = SFit
-                            , widthMin = Nothing
-                            , widthMax = Nothing
-                            , horizAlign = HCenter
-                            , vertAlign = VCenter
-                            , text = Nothing
-                            , layoutDirection = LeftToRight
-                            , paddingTop = 0
-                            , paddingRight = 0
-                            , paddingBottom = 0
-                            , paddingLeft = 0
-                            }
-                        )
+                    |> Expect.equal (AEl default)
         , Test.test "grow container -> still 0" <|
             \() ->
                 Container
@@ -92,28 +59,9 @@ suite =
                     |> run
                     |> Expect.equal
                         (AEl
-                            { x = 0
-                            , y = 0
-                            , width = 0
-                            , height = 0
-                            , bgColor = Nothing
-                            , children = []
-                            , childGap = 0
-                            , fontSize = Nothing
-                            , heightSpec = SGrow
-                            , heightMin = Nothing
-                            , heightMax = Nothing
-                            , widthSpec = SGrow
-                            , widthMin = Nothing
-                            , widthMax = Nothing
-                            , horizAlign = HCenter
-                            , vertAlign = VCenter
-                            , text = Nothing
-                            , layoutDirection = LeftToRight
-                            , paddingTop = 0
-                            , paddingRight = 0
-                            , paddingBottom = 0
-                            , paddingLeft = 0
+                            { default
+                                | heightSpec = SGrow
+                                , widthSpec = SGrow
                             }
                         )
         , Test.test "fixed container LR -> both fixed dimensions filled" <|
@@ -127,28 +75,11 @@ suite =
                     |> run
                     |> Expect.equal
                         (AEl
-                            { x = 0
-                            , y = 0
-                            , width = 456
-                            , height = 123
-                            , bgColor = Nothing
-                            , children = []
-                            , childGap = 0
-                            , fontSize = Nothing
-                            , heightSpec = SFixed 123
-                            , heightMin = Nothing
-                            , heightMax = Nothing
-                            , widthSpec = SFixed 456
-                            , widthMin = Nothing
-                            , widthMax = Nothing
-                            , horizAlign = HCenter
-                            , vertAlign = VCenter
-                            , text = Nothing
-                            , layoutDirection = LeftToRight
-                            , paddingTop = 0
-                            , paddingRight = 0
-                            , paddingBottom = 0
-                            , paddingLeft = 0
+                            { default
+                                | width = 456
+                                , height = 123
+                                , widthSpec = SFixed 456
+                                , heightSpec = SFixed 123
                             }
                         )
         , Test.test "fit container LR with fixed child -> both same width, container unfilled height" <|
@@ -167,53 +98,9 @@ suite =
                     |> run
                     |> Expect.equal
                         (AEl
-                            { x = 0
-                            , y = 0
-                            , width = 456
-                            , height = 0
-                            , bgColor = Nothing
-                            , children =
-                                [ AEl
-                                    { x = 0
-                                    , y = 0
-                                    , width = 456
-                                    , height = 123
-                                    , bgColor = Nothing
-                                    , children = []
-                                    , childGap = 0
-                                    , fontSize = Nothing
-                                    , heightSpec = SFixed 123
-                                    , heightMin = Nothing
-                                    , heightMax = Nothing
-                                    , widthSpec = SFixed 456
-                                    , widthMin = Nothing
-                                    , widthMax = Nothing
-                                    , horizAlign = HCenter
-                                    , vertAlign = VCenter
-                                    , text = Nothing
-                                    , layoutDirection = LeftToRight
-                                    , paddingTop = 0
-                                    , paddingRight = 0
-                                    , paddingBottom = 0
-                                    , paddingLeft = 0
-                                    }
-                                ]
-                            , childGap = 0
-                            , fontSize = Nothing
-                            , heightSpec = SFit
-                            , heightMin = Nothing
-                            , heightMax = Nothing
-                            , widthSpec = SFit
-                            , widthMin = Nothing
-                            , widthMax = Nothing
-                            , horizAlign = HCenter
-                            , vertAlign = VCenter
-                            , text = Nothing
-                            , layoutDirection = LeftToRight
-                            , paddingTop = 0
-                            , paddingRight = 0
-                            , paddingBottom = 0
-                            , paddingLeft = 0
+                            { default
+                                | width = 456
+                                , children = [ fixedChild 456 123 ]
                             }
                         )
         , Test.test "fit container with fit child -> both 0" <|
@@ -230,56 +117,7 @@ suite =
                     ]
                     |> run
                     |> Expect.equal
-                        (AEl
-                            { x = 0
-                            , y = 0
-                            , width = 0
-                            , height = 0
-                            , bgColor = Nothing
-                            , children =
-                                [ AEl
-                                    { x = 0
-                                    , y = 0
-                                    , width = 0
-                                    , height = 0
-                                    , bgColor = Nothing
-                                    , children = []
-                                    , childGap = 0
-                                    , fontSize = Nothing
-                                    , heightSpec = SFit
-                                    , heightMin = Nothing
-                                    , heightMax = Nothing
-                                    , widthSpec = SFit
-                                    , widthMin = Nothing
-                                    , widthMax = Nothing
-                                    , horizAlign = HCenter
-                                    , vertAlign = VCenter
-                                    , text = Nothing
-                                    , layoutDirection = LeftToRight
-                                    , paddingTop = 0
-                                    , paddingRight = 0
-                                    , paddingBottom = 0
-                                    , paddingLeft = 0
-                                    }
-                                ]
-                            , childGap = 0
-                            , fontSize = Nothing
-                            , heightSpec = SFit
-                            , heightMin = Nothing
-                            , heightMax = Nothing
-                            , widthSpec = SFit
-                            , widthMin = Nothing
-                            , widthMax = Nothing
-                            , horizAlign = HCenter
-                            , vertAlign = VCenter
-                            , text = Nothing
-                            , layoutDirection = LeftToRight
-                            , paddingTop = 0
-                            , paddingRight = 0
-                            , paddingBottom = 0
-                            , paddingLeft = 0
-                            }
-                        )
+                        (AEl { default | children = [ AEl default ] })
         , Test.test "fit container with padding -> use the padding" <|
             \() ->
                 Container
@@ -291,28 +129,12 @@ suite =
                     |> run
                     |> Expect.equal
                         (AEl
-                            { x = 0
-                            , y = 0
-                            , width = 3 + 7
-                            , height = 0
-                            , bgColor = Nothing
-                            , children = []
-                            , childGap = 0
-                            , fontSize = Nothing
-                            , heightSpec = SFit
-                            , heightMin = Nothing
-                            , heightMax = Nothing
-                            , widthSpec = SFit
-                            , widthMin = Nothing
-                            , widthMax = Nothing
-                            , horizAlign = HCenter
-                            , vertAlign = VCenter
-                            , text = Nothing
-                            , layoutDirection = LeftToRight
-                            , paddingTop = 2
-                            , paddingRight = 3
-                            , paddingBottom = 5
-                            , paddingLeft = 7
+                            { default
+                                | width = 3 + 7
+                                , paddingTop = 2
+                                , paddingRight = 3
+                                , paddingBottom = 5
+                                , paddingLeft = 7
                             }
                         )
         , Test.test "fit container with child, both with paddings -> use the padding" <|
@@ -326,53 +148,22 @@ suite =
                     |> run
                     |> Expect.equal
                         (AEl
-                            { x = 0
-                            , y = 0
-                            , width = 3 + 7 + 30 + 70
-                            , height = 0
-                            , bgColor = Nothing
-                            , children =
-                                [ AEl
-                                    { x = 0
-                                    , y = 0
-                                    , width = 30 + 70
-                                    , height = 0
-                                    , bgColor = Nothing
-                                    , children = []
-                                    , childGap = 0
-                                    , fontSize = Nothing
-                                    , heightSpec = SFit
-                                    , heightMin = Nothing
-                                    , heightMax = Nothing
-                                    , widthSpec = SFit
-                                    , widthMin = Nothing
-                                    , widthMax = Nothing
-                                    , horizAlign = HCenter
-                                    , vertAlign = VCenter
-                                    , text = Nothing
-                                    , layoutDirection = LeftToRight
-                                    , paddingTop = 20
-                                    , paddingRight = 30
-                                    , paddingBottom = 50
-                                    , paddingLeft = 70
-                                    }
-                                ]
-                            , childGap = 0
-                            , fontSize = Nothing
-                            , heightSpec = SFit
-                            , heightMin = Nothing
-                            , heightMax = Nothing
-                            , widthSpec = SFit
-                            , widthMin = Nothing
-                            , widthMax = Nothing
-                            , horizAlign = HCenter
-                            , vertAlign = VCenter
-                            , text = Nothing
-                            , layoutDirection = LeftToRight
-                            , paddingTop = 2
-                            , paddingRight = 3
-                            , paddingBottom = 5
-                            , paddingLeft = 7
+                            { default
+                                | width = 3 + 7 + 30 + 70
+                                , paddingTop = 2
+                                , paddingRight = 3
+                                , paddingBottom = 5
+                                , paddingLeft = 7
+                                , children =
+                                    [ AEl
+                                        { default
+                                            | width = 30 + 70
+                                            , paddingTop = 20
+                                            , paddingRight = 30
+                                            , paddingBottom = 50
+                                            , paddingLeft = 70
+                                        }
+                                    ]
                             }
                         )
         , Test.test "fit container with no children and gap -> don't use the gap" <|
@@ -384,32 +175,7 @@ suite =
                     ]
                     []
                     |> run
-                    |> Expect.equal
-                        (AEl
-                            { x = 0
-                            , y = 0
-                            , width = 0
-                            , height = 0
-                            , bgColor = Nothing
-                            , children = []
-                            , childGap = 1
-                            , fontSize = Nothing
-                            , heightSpec = SFit
-                            , heightMin = Nothing
-                            , heightMax = Nothing
-                            , widthSpec = SFit
-                            , widthMin = Nothing
-                            , widthMax = Nothing
-                            , horizAlign = HCenter
-                            , vertAlign = VCenter
-                            , text = Nothing
-                            , layoutDirection = LeftToRight
-                            , paddingTop = 0
-                            , paddingRight = 0
-                            , paddingBottom = 0
-                            , paddingLeft = 0
-                            }
-                        )
+                    |> Expect.equal (AEl { default | childGap = 1 })
         , Test.test "fit container with one children and gap -> don't use the gap" <|
             \() ->
                 Container
@@ -426,53 +192,10 @@ suite =
                     |> run
                     |> Expect.equal
                         (AEl
-                            { x = 0
-                            , y = 0
-                            , width = 200
-                            , height = 0
-                            , bgColor = Nothing
-                            , children =
-                                [ AEl
-                                    { x = 0
-                                    , y = 0
-                                    , width = 200
-                                    , height = 100
-                                    , bgColor = Nothing
-                                    , children = []
-                                    , childGap = 0
-                                    , fontSize = Nothing
-                                    , heightSpec = SFixed 100
-                                    , heightMin = Nothing
-                                    , heightMax = Nothing
-                                    , widthSpec = SFixed 200
-                                    , widthMin = Nothing
-                                    , widthMax = Nothing
-                                    , horizAlign = HCenter
-                                    , vertAlign = VCenter
-                                    , text = Nothing
-                                    , layoutDirection = LeftToRight
-                                    , paddingTop = 0
-                                    , paddingRight = 0
-                                    , paddingBottom = 0
-                                    , paddingLeft = 0
-                                    }
-                                ]
-                            , childGap = 1
-                            , fontSize = Nothing
-                            , heightSpec = SFit
-                            , heightMin = Nothing
-                            , heightMax = Nothing
-                            , widthSpec = SFit
-                            , widthMin = Nothing
-                            , widthMax = Nothing
-                            , horizAlign = HCenter
-                            , vertAlign = VCenter
-                            , text = Nothing
-                            , layoutDirection = LeftToRight
-                            , paddingTop = 0
-                            , paddingRight = 0
-                            , paddingBottom = 0
-                            , paddingLeft = 0
+                            { default
+                                | width = 200
+                                , childGap = 1
+                                , children = [ fixedChild 200 100 ]
                             }
                         )
         , Test.test "fit container with two children and gap -> use the gap 1x" <|
@@ -496,77 +219,13 @@ suite =
                     |> run
                     |> Expect.equal
                         (AEl
-                            { x = 0
-                            , y = 0
-                            , width = 401
-                            , height = 0
-                            , bgColor = Nothing
-                            , children =
-                                [ AEl
-                                    { x = 0
-                                    , y = 0
-                                    , width = 200
-                                    , height = 100
-                                    , bgColor = Nothing
-                                    , children = []
-                                    , childGap = 0
-                                    , fontSize = Nothing
-                                    , heightSpec = SFixed 100
-                                    , heightMin = Nothing
-                                    , heightMax = Nothing
-                                    , widthSpec = SFixed 200
-                                    , widthMin = Nothing
-                                    , widthMax = Nothing
-                                    , horizAlign = HCenter
-                                    , vertAlign = VCenter
-                                    , text = Nothing
-                                    , layoutDirection = LeftToRight
-                                    , paddingTop = 0
-                                    , paddingRight = 0
-                                    , paddingBottom = 0
-                                    , paddingLeft = 0
-                                    }
-                                , AEl
-                                    { x = 0
-                                    , y = 0
-                                    , width = 200
-                                    , height = 100
-                                    , bgColor = Nothing
-                                    , children = []
-                                    , childGap = 0
-                                    , fontSize = Nothing
-                                    , heightSpec = SFixed 100
-                                    , heightMin = Nothing
-                                    , heightMax = Nothing
-                                    , widthSpec = SFixed 200
-                                    , widthMin = Nothing
-                                    , widthMax = Nothing
-                                    , horizAlign = HCenter
-                                    , vertAlign = VCenter
-                                    , text = Nothing
-                                    , layoutDirection = LeftToRight
-                                    , paddingTop = 0
-                                    , paddingRight = 0
-                                    , paddingBottom = 0
-                                    , paddingLeft = 0
-                                    }
-                                ]
-                            , childGap = 1
-                            , fontSize = Nothing
-                            , heightSpec = SFit
-                            , heightMin = Nothing
-                            , heightMax = Nothing
-                            , widthSpec = SFit
-                            , widthMin = Nothing
-                            , widthMax = Nothing
-                            , horizAlign = HCenter
-                            , vertAlign = VCenter
-                            , text = Nothing
-                            , layoutDirection = LeftToRight
-                            , paddingTop = 0
-                            , paddingRight = 0
-                            , paddingBottom = 0
-                            , paddingLeft = 0
+                            { default
+                                | width = 401
+                                , childGap = 1
+                                , children =
+                                    [ fixedChild 200 100
+                                    , fixedChild 200 100
+                                    ]
                             }
                         )
         , Test.test "fit container with two children and gap -> use the gap 1x, vertical" <|
@@ -591,77 +250,14 @@ suite =
                     |> run
                     |> Expect.equal
                         (AEl
-                            { x = 0
-                            , y = 0
-                            , width = 0
-                            , height = 201
-                            , bgColor = Nothing
-                            , children =
-                                [ AEl
-                                    { x = 0
-                                    , y = 0
-                                    , width = 200
-                                    , height = 100
-                                    , bgColor = Nothing
-                                    , children = []
-                                    , childGap = 0
-                                    , fontSize = Nothing
-                                    , heightSpec = SFixed 100
-                                    , heightMin = Nothing
-                                    , heightMax = Nothing
-                                    , widthSpec = SFixed 200
-                                    , widthMin = Nothing
-                                    , widthMax = Nothing
-                                    , horizAlign = HCenter
-                                    , vertAlign = VCenter
-                                    , text = Nothing
-                                    , layoutDirection = LeftToRight
-                                    , paddingTop = 0
-                                    , paddingRight = 0
-                                    , paddingBottom = 0
-                                    , paddingLeft = 0
-                                    }
-                                , AEl
-                                    { x = 0
-                                    , y = 0
-                                    , width = 200
-                                    , height = 100
-                                    , bgColor = Nothing
-                                    , children = []
-                                    , childGap = 0
-                                    , fontSize = Nothing
-                                    , heightSpec = SFixed 100
-                                    , heightMin = Nothing
-                                    , heightMax = Nothing
-                                    , widthSpec = SFixed 200
-                                    , widthMin = Nothing
-                                    , widthMax = Nothing
-                                    , horizAlign = HCenter
-                                    , vertAlign = VCenter
-                                    , text = Nothing
-                                    , layoutDirection = LeftToRight
-                                    , paddingTop = 0
-                                    , paddingRight = 0
-                                    , paddingBottom = 0
-                                    , paddingLeft = 0
-                                    }
-                                ]
-                            , childGap = 1
-                            , fontSize = Nothing
-                            , heightSpec = SFit
-                            , heightMin = Nothing
-                            , heightMax = Nothing
-                            , widthSpec = SFit
-                            , widthMin = Nothing
-                            , widthMax = Nothing
-                            , horizAlign = HCenter
-                            , vertAlign = VCenter
-                            , text = Nothing
-                            , layoutDirection = TopToBottom
-                            , paddingTop = 0
-                            , paddingRight = 0
-                            , paddingBottom = 0
-                            , paddingLeft = 0
+                            { default
+                                | height = 201
+                                , layoutDirection = TopToBottom
+                                , childGap = 1
+                                , children =
+                                    [ fixedChild 200 100
+                                    , fixedChild 200 100
+                                    ]
                             }
                         )
         , Test.test "fit container with three children and gap -> use the gap 2x" <|
@@ -690,101 +286,14 @@ suite =
                     |> run
                     |> Expect.equal
                         (AEl
-                            { x = 0
-                            , y = 0
-                            , width = 602
-                            , height = 0
-                            , bgColor = Nothing
-                            , children =
-                                [ AEl
-                                    { x = 0
-                                    , y = 0
-                                    , width = 200
-                                    , height = 100
-                                    , bgColor = Nothing
-                                    , children = []
-                                    , childGap = 0
-                                    , fontSize = Nothing
-                                    , heightSpec = SFixed 100
-                                    , heightMin = Nothing
-                                    , heightMax = Nothing
-                                    , widthSpec = SFixed 200
-                                    , widthMin = Nothing
-                                    , widthMax = Nothing
-                                    , horizAlign = HCenter
-                                    , vertAlign = VCenter
-                                    , text = Nothing
-                                    , layoutDirection = LeftToRight
-                                    , paddingTop = 0
-                                    , paddingRight = 0
-                                    , paddingBottom = 0
-                                    , paddingLeft = 0
-                                    }
-                                , AEl
-                                    { x = 0
-                                    , y = 0
-                                    , width = 200
-                                    , height = 100
-                                    , bgColor = Nothing
-                                    , children = []
-                                    , childGap = 0
-                                    , fontSize = Nothing
-                                    , heightSpec = SFixed 100
-                                    , heightMin = Nothing
-                                    , heightMax = Nothing
-                                    , widthSpec = SFixed 200
-                                    , widthMin = Nothing
-                                    , widthMax = Nothing
-                                    , horizAlign = HCenter
-                                    , vertAlign = VCenter
-                                    , text = Nothing
-                                    , layoutDirection = LeftToRight
-                                    , paddingTop = 0
-                                    , paddingRight = 0
-                                    , paddingBottom = 0
-                                    , paddingLeft = 0
-                                    }
-                                , AEl
-                                    { x = 0
-                                    , y = 0
-                                    , width = 200
-                                    , height = 100
-                                    , bgColor = Nothing
-                                    , children = []
-                                    , childGap = 0
-                                    , fontSize = Nothing
-                                    , heightSpec = SFixed 100
-                                    , heightMin = Nothing
-                                    , heightMax = Nothing
-                                    , widthSpec = SFixed 200
-                                    , widthMin = Nothing
-                                    , widthMax = Nothing
-                                    , horizAlign = HCenter
-                                    , vertAlign = VCenter
-                                    , text = Nothing
-                                    , layoutDirection = LeftToRight
-                                    , paddingTop = 0
-                                    , paddingRight = 0
-                                    , paddingBottom = 0
-                                    , paddingLeft = 0
-                                    }
-                                ]
-                            , childGap = 1
-                            , fontSize = Nothing
-                            , heightSpec = SFit
-                            , heightMin = Nothing
-                            , heightMax = Nothing
-                            , widthSpec = SFit
-                            , widthMin = Nothing
-                            , widthMax = Nothing
-                            , horizAlign = HCenter
-                            , vertAlign = VCenter
-                            , text = Nothing
-                            , layoutDirection = LeftToRight
-                            , paddingTop = 0
-                            , paddingRight = 0
-                            , paddingBottom = 0
-                            , paddingLeft = 0
+                            { default
+                                | width = 602
+                                , childGap = 1
+                                , children =
+                                    [ fixedChild 200 100
+                                    , fixedChild 200 100
+                                    , fixedChild 200 100
+                                    ]
                             }
                         )
         ]

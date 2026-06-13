@@ -5,7 +5,7 @@ import Expect
 import Fuzz
 import Step0Annotate as Step0
 import Test exposing (Test)
-import TestHelpers
+import TestHelpers exposing (default, el)
 
 
 suite : Test
@@ -21,22 +21,9 @@ suite =
                     |> Step0.annotate
                     |> Expect.equal
                         (AEl
-                            { x = 0, y = 0, width = 0, height = 0
-                            , bgColor = Just Purple
-                            , children = []
-                            , childGap = 0
-                            , fontSize = Nothing
-                            , heightSpec = SFit
-                            , heightMin = Nothing
-                            , heightMax = Nothing
-                            , widthSpec = SFit
-                            , widthMin = Nothing
-                            , widthMax = Nothing
-                            , horizAlign = HCenter
-                            , vertAlign = VCenter
-                            , text = Nothing
-                            , layoutDirection = TopToBottom
-                            , paddingTop = 0, paddingRight = 0, paddingBottom = 0, paddingLeft = 0
+                            { default
+                                | bgColor = Just Purple
+                                , layoutDirection = TopToBottom
                             }
                         )
         , Test.test "ex2 - purple menu with two light-purple items" <|
@@ -63,171 +50,37 @@ suite =
                     |> Step0.annotate
                     |> Expect.equal
                         (AEl
-                            { x = 0, y = 0, width = 0, height = 0
-                            , bgColor = Just Purple
-                            , children =
-                                [ AEl
-                                    { x = 0, y = 0, width = 0, height = 0
-                                    , bgColor = Just LightPurple
-                                    , children =
-                                        [ AEl
-                                            { x = 0, y = 0, width = 0, height = 0
-                                            , bgColor = Nothing
-                                            , children = []
-                                            , childGap = 0
-                                            , fontSize = Just 18
-                                            , heightSpec = SFit
-                            , heightMin = Nothing
-                            , heightMax = Nothing
-                                            , widthSpec = SFit
-                            , widthMin = Nothing
-                            , widthMax = Nothing
-                                            , horizAlign = HCenter
-                                            , vertAlign = VCenter
-                                            , text = Just "Copy"
-                                            , layoutDirection = LeftToRight
-                                            , paddingTop = 0, paddingRight = 0, paddingBottom = 0, paddingLeft = 0
-                                            }
-                                        , AEl
-                                            { x = 0, y = 0, width = 0, height = 0
-                                            , bgColor = Nothing
+                            { default
+                                | bgColor = Just Purple
+                                , layoutDirection = TopToBottom
+                                , children =
+                                    [ AEl
+                                        { default
+                                            | bgColor = Just LightPurple
+                                            , widthSpec = SGrow
                                             , children =
-                                                [ AEl
-                                                    { x = 0, y = 0, width = 0, height = 0
-                                                    , bgColor = Nothing
-                                                    , children = []
-                                                    , childGap = 0
-                                                    , fontSize = Nothing
-                                                    , heightSpec = SFit
-                            , heightMin = Nothing
-                            , heightMax = Nothing
-                                                    , widthSpec = SFit
-                            , widthMin = Nothing
-                            , widthMax = Nothing
-                                                    , horizAlign = HCenter
-                                                    , vertAlign = VCenter
-                                                    , text = Just "copy"
-                                                    , layoutDirection = LeftToRight
-                                                    , paddingTop = 0, paddingRight = 0, paddingBottom = 0, paddingLeft = 0
+                                                [ AEl { default | fontSize = Just 18, text = Just "Copy" }
+                                                , AEl
+                                                    { default
+                                                        | children =
+                                                            [ AEl { default | text = Just "copy" } ]
                                                     }
                                                 ]
-                                            , childGap = 0
-                                            , fontSize = Nothing
-                                            , heightSpec = SFit
-                            , heightMin = Nothing
-                            , heightMax = Nothing
-                                            , widthSpec = SFit
-                            , widthMin = Nothing
-                            , widthMax = Nothing
-                                            , horizAlign = HCenter
-                                            , vertAlign = VCenter
-                                            , text = Nothing
-                                            , layoutDirection = LeftToRight
-                                            , paddingTop = 0, paddingRight = 0, paddingBottom = 0, paddingLeft = 0
-                                            }
-                                        ]
-                                    , childGap = 0
-                                    , fontSize = Nothing
-                                    , heightSpec = SFit
-                            , heightMin = Nothing
-                            , heightMax = Nothing
-                                    , widthSpec = SGrow
-                            , widthMin = Nothing
-                            , widthMax = Nothing
-                                    , horizAlign = HCenter
-                                    , vertAlign = VCenter
-                                    , text = Nothing
-                                    , layoutDirection = LeftToRight
-                                    , paddingTop = 0, paddingRight = 0, paddingBottom = 0, paddingLeft = 0
-                                    }
-                                , AEl
-                                    { x = 0, y = 0, width = 0, height = 0
-                                    , bgColor = Just LightPurple
-                                    , children =
-                                        [ AEl
-                                            { x = 0, y = 0, width = 0, height = 0
-                                            , bgColor = Nothing
-                                            , children = []
-                                            , childGap = 0
-                                            , fontSize = Just 18
-                                            , heightSpec = SFit
-                            , heightMin = Nothing
-                            , heightMax = Nothing
-                                            , widthSpec = SFit
-                            , widthMin = Nothing
-                            , widthMax = Nothing
-                                            , horizAlign = HCenter
-                                            , vertAlign = VCenter
-                                            , text = Just "Paste"
-                                            , layoutDirection = LeftToRight
-                                            , paddingTop = 0, paddingRight = 0, paddingBottom = 0, paddingLeft = 0
-                                            }
-                                        , AEl
-                                            { x = 0, y = 0, width = 0, height = 0
-                                            , bgColor = Nothing
+                                        }
+                                    , AEl
+                                        { default
+                                            | bgColor = Just LightPurple
+                                            , widthSpec = SGrow
                                             , children =
-                                                [ AEl
-                                                    { x = 0, y = 0, width = 0, height = 0
-                                                    , bgColor = Nothing
-                                                    , children = []
-                                                    , childGap = 0
-                                                    , fontSize = Nothing
-                                                    , heightSpec = SFit
-                            , heightMin = Nothing
-                            , heightMax = Nothing
-                                                    , widthSpec = SFit
-                            , widthMin = Nothing
-                            , widthMax = Nothing
-                                                    , horizAlign = HCenter
-                                                    , vertAlign = VCenter
-                                                    , text = Just "paste"
-                                                    , layoutDirection = LeftToRight
-                                                    , paddingTop = 0, paddingRight = 0, paddingBottom = 0, paddingLeft = 0
+                                                [ AEl { default | fontSize = Just 18, text = Just "Paste" }
+                                                , AEl
+                                                    { default
+                                                        | children =
+                                                            [ AEl { default | text = Just "paste" } ]
                                                     }
                                                 ]
-                                            , childGap = 0
-                                            , fontSize = Nothing
-                                            , heightSpec = SFit
-                            , heightMin = Nothing
-                            , heightMax = Nothing
-                                            , widthSpec = SFit
-                            , widthMin = Nothing
-                            , widthMax = Nothing
-                                            , horizAlign = HCenter
-                                            , vertAlign = VCenter
-                                            , text = Nothing
-                                            , layoutDirection = LeftToRight
-                                            , paddingTop = 0, paddingRight = 0, paddingBottom = 0, paddingLeft = 0
-                                            }
-                                        ]
-                                    , childGap = 0
-                                    , fontSize = Nothing
-                                    , heightSpec = SFit
-                            , heightMin = Nothing
-                            , heightMax = Nothing
-                                    , widthSpec = SGrow
-                            , widthMin = Nothing
-                            , widthMax = Nothing
-                                    , horizAlign = HCenter
-                                    , vertAlign = VCenter
-                                    , text = Nothing
-                                    , layoutDirection = LeftToRight
-                                    , paddingTop = 0, paddingRight = 0, paddingBottom = 0, paddingLeft = 0
-                                    }
-                                ]
-                            , childGap = 0
-                            , fontSize = Nothing
-                            , heightSpec = SFit
-                            , heightMin = Nothing
-                            , heightMax = Nothing
-                            , widthSpec = SFit
-                            , widthMin = Nothing
-                            , widthMax = Nothing
-                            , horizAlign = HCenter
-                            , vertAlign = VCenter
-                            , text = Nothing
-                            , layoutDirection = TopToBottom
-                            , paddingTop = 0, paddingRight = 0, paddingBottom = 0, paddingLeft = 0
+                                        }
+                                    ]
                             }
                         )
         , Test.test "ex3 - blue container with pink and yellow children" <|
@@ -255,62 +108,32 @@ suite =
                     |> Step0.annotate
                     |> Expect.equal
                         (AEl
-                            { x = 0, y = 0, width = 0, height = 0
-                            , bgColor = Just Blue
-                            , children =
-                                [ AEl
-                                    { x = 0, y = 0, width = 0, height = 0
-                                    , bgColor = Just Pink
-                                    , children = []
-                                    , childGap = 0
-                                    , fontSize = Nothing
-                                    , widthSpec = SFixed 300
-                            , widthMin = Nothing
-                            , widthMax = Nothing
-                                    , heightSpec = SFixed 300
-                            , heightMin = Nothing
-                            , heightMax = Nothing
-                                    , horizAlign = HCenter
-                                    , vertAlign = VCenter
-                                    , text = Nothing
-                                    , layoutDirection = LeftToRight
-                                    , paddingTop = 0, paddingRight = 0, paddingBottom = 0, paddingLeft = 0
-                                    }
-                                , AEl
-                                    { x = 0, y = 0, width = 0, height = 0
-                                    , bgColor = Just Yellow
-                                    , children = []
-                                    , childGap = 0
-                                    , fontSize = Nothing
-                                    , widthSpec = SFixed 350
-                            , widthMin = Nothing
-                            , widthMax = Nothing
-                                    , heightSpec = SFixed 200
-                            , heightMin = Nothing
-                            , heightMax = Nothing
-                                    , horizAlign = HCenter
-                                    , vertAlign = VCenter
-                                    , text = Nothing
-                                    , layoutDirection = LeftToRight
-                                    , paddingTop = 0, paddingRight = 0, paddingBottom = 0, paddingLeft = 0
-                                    }
-                                ]
-                            , childGap = 32
-                            , fontSize = Nothing
-                            , widthSpec = SFixed 960
-                            , widthMin = Nothing
-                            , widthMax = Nothing
-                            , heightSpec = SFixed 540
-                            , heightMin = Nothing
-                            , heightMax = Nothing
-                            , horizAlign = HCenter
-                            , vertAlign = VCenter
-                            , text = Nothing
-                            , layoutDirection = LeftToRight
-                            , paddingTop = 32, paddingRight = 32, paddingBottom = 32, paddingLeft = 32
+                            { default
+                                | bgColor = Just Blue
+                                , childGap = 32
+                                , widthSpec = SFixed 960
+                                , heightSpec = SFixed 540
+                                , paddingTop = 32
+                                , paddingRight = 32
+                                , paddingBottom = 32
+                                , paddingLeft = 32
+                                , children =
+                                    [ AEl
+                                        { default
+                                            | bgColor = Just Pink
+                                            , widthSpec = SFixed 300
+                                            , heightSpec = SFixed 300
+                                        }
+                                    , AEl
+                                        { default
+                                            | bgColor = Just Yellow
+                                            , widthSpec = SFixed 350
+                                            , heightSpec = SFixed 200
+                                        }
+                                    ]
                             }
                         )
-        , Test.fuzz TestHelpers.el "position and size are zero" <|
+        , Test.fuzz el "position and size are zero" <|
             \input ->
                 input
                     |> Step0.annotate
@@ -319,7 +142,7 @@ suite =
                     |> Expect.equal True
 
         -- TODO test that the attr properties are preserved?
-        , Test.fuzz (Fuzz.list TestHelpers.el) "tree structure is preserved" <|
+        , Test.fuzz (Fuzz.list el) "tree structure is preserved" <|
             \children ->
                 let
                     el =

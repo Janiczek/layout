@@ -1,9 +1,9 @@
 module El exposing
     ( El(..)
-    , AnnotatedEl(..), AnnotatedElData
+    , AnnotatedEl(..), AnnotatedElData, empty
     , Attr(..)
     , LayoutDirection(..), axes
-    , Size(..), SizeAttr(..), SizeSpec(..), sizeSpec
+    , Size(..), SizeAttr(..), SizeSpec(..)
     , HorizAlign(..), VertAlign(..)
     , Color(..)
     , TextAttr(..)
@@ -16,11 +16,11 @@ module El exposing
 {-|
 
 @docs El
-@docs AnnotatedEl, AnnotatedElData
+@docs AnnotatedEl, AnnotatedElData, empty
 
 @docs Attr
 @docs LayoutDirection, axes
-@docs Size, SizeAttr, SizeSpec, sizeSpec
+@docs Size, SizeAttr, SizeSpec
 @docs HorizAlign, VertAlign
 @docs Color
 @docs TextAttr
@@ -265,14 +265,28 @@ axes (AEl ael) =
 ----------
 
 
-sizeSpec : Size -> SizeSpec
-sizeSpec size =
-    case size of
-        Fixed n ->
-            SFixed n
-
-        Fit _ ->
-            SFit
-
-        Grow _ ->
-            SGrow
+empty : AnnotatedElData
+empty =
+    { x = 0
+    , y = 0
+    , width = 0
+    , height = 0
+    , children = []
+    , layoutDirection = LeftToRight
+    , horizAlign = HCenter
+    , vertAlign = VCenter
+    , widthSpec = SFit
+    , widthMin = Nothing
+    , widthMax = Nothing
+    , heightSpec = SFit
+    , heightMin = Nothing
+    , heightMax = Nothing
+    , paddingTop = 0
+    , paddingRight = 0
+    , paddingBottom = 0
+    , paddingLeft = 0
+    , childGap = 0
+    , bgColor = Nothing
+    , fontSize = Nothing
+    , text = Nothing
+    }

@@ -1,7 +1,12 @@
-module TestHelpers exposing (el, elWithMaxDepth)
+module TestHelpers exposing (default, el, elWithMaxDepth)
 
 import El exposing (..)
 import Fuzz exposing (Fuzzer)
+
+
+default : AnnotatedElData
+default =
+    El.empty
 
 
 el : Fuzzer El
