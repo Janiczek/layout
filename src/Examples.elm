@@ -22,7 +22,7 @@ ex2 =
                 , BgColor LightPurple
                 ]
                 [ Text [ FontSize 18 ] label
-                , Container [ ImageData icon ] []
+                , Container [] [ Text [] icon ]
                 ]
     in
     Container

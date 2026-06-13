@@ -1,4 +1,4 @@
-module Step4FitSizingHeightsTests exposing (suite)
+module Step4FitSizingAcrossTests exposing (suite)
 
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer)

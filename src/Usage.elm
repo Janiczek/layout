@@ -50,11 +50,11 @@ Going down (with children sizes being already done):
   parent height = parent top padding + parent bottom padding + max of child heights
   (or switched if direction TB)
 
-1. Fit sizing widths (depth first post order?)
-2. Grow & shrink sizing widths (breadth first)
+1. Fit sizing along (depth first post order?)
+2. Grow & shrink sizing along (breadth first)
 3. Wrap text
-4. Fit sizing heights (depth first post order?)
-5. Grow & shrink sizing heights (breadth first)
+4. Fit sizing across (depth first post order?)
+5. Grow & shrink sizing across (breadth first)
 6. Positions & alignment
 7. Draw
 

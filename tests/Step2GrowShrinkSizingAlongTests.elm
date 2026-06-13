@@ -1,4 +1,4 @@
-module Step5GrowShrinkSizingHeightsTests exposing (suite)
+module Step2GrowShrinkSizingAlongTests exposing (suite)
 
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer)

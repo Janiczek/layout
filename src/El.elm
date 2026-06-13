@@ -2,14 +2,15 @@ module El exposing
     ( El(..)
     , AnnotatedEl(..), AnnotatedElData
     , Attr(..)
-    , LayoutDirection(..)
-    , Size(..), SizeAttr(..)
+    , LayoutDirection(..), axes
+    , Size(..), SizeAttr(..), SizeSpec(..), sizeSpec
     , HorizAlign(..), VertAlign(..)
     , Color(..)
     , TextAttr(..)
-    , foldPreOrder, foldPostOrder
     , preOrder, postOrder
-    , annotatedPreOrder, annotatedPostOrder
+    , mapPreOrder, mapPostOrder
+    , foldPreOrder, foldPostOrder
+    , mapAccumPreOrder, mapAccumPostOrder
     )
 
 {-|
@@ -18,15 +19,16 @@ module El exposing
 @docs AnnotatedEl, AnnotatedElData
 
 @docs Attr
-@docs LayoutDirection
-@docs Size, SizeAttr
+@docs LayoutDirection, axes
+@docs Size, SizeAttr, SizeSpec, sizeSpec
 @docs HorizAlign, VertAlign
 @docs Color
 @docs TextAttr
 
-@docs foldPreOrder, foldPostOrder
 @docs preOrder, postOrder
-@docs annotatedPreOrder, annotatedPostOrder
+@docs mapPreOrder, mapPostOrder
+@docs foldPreOrder, foldPostOrder
+@docs mapAccumPreOrder, mapAccumPostOrder
 
 -}
 
@@ -42,14 +44,10 @@ type AnnotatedEl
 
 
 type alias AnnotatedElData =
-    { position :
-        { x : Float
-        , y : Float
-        }
-    , size :
-        { width : Float
-        , height : Float
-        }
+    { x : Float
+    , y : Float
+    , width : Int
+    , height : Int
     , layoutDirection : LayoutDirection
     , horizAlign : HorizAlign
     , vertAlign : VertAlign
@@ -57,17 +55,17 @@ type alias AnnotatedElData =
     , bgColor : Maybe Color
     , fontSize : Maybe Int
     , childGap : Int
-    , text :
-        -- TODO think about data modeling this Maybe away
-        Maybe String
-    , widthSpec : Size
-    , heightSpec : Size
-    , padding :
-        { top : Int
-        , right : Int
-        , bottom : Int
-        , left : Int
-        }
+    , text : Maybe String
+    , widthSpec : SizeSpec
+    , widthMin : Maybe Int
+    , widthMax : Maybe Int
+    , heightSpec : SizeSpec
+    , heightMin : Maybe Int
+    , heightMax : Maybe Int
+    , paddingTop : Int
+    , paddingRight : Int
+    , paddingBottom : Int
+    , paddingLeft : Int
     }
 
 
@@ -105,6 +103,12 @@ type Size
     | Grow (List SizeAttr)
 
 
+type SizeSpec
+    = SFixed Int
+    | SFit
+    | SGrow
+
+
 type SizeAttr
     = Min Int
     | Max Int
@@ -122,59 +126,153 @@ type TextAttr
     = FontSize Int
 
 
-foldPreOrder : (El -> acc -> acc) -> acc -> El -> acc
-foldPreOrder step acc el =
-    case el of
-        Container _ children ->
-            List.foldl
-                (\child childAcc -> foldPreOrder step childAcc child)
-                (step el acc)
-                children
-
-        Text _ _ ->
-            step el acc
-
-        Empty ->
-            step el acc
+foldPreOrder : (AnnotatedEl -> acc -> acc) -> acc -> AnnotatedEl -> acc
+foldPreOrder step acc ((AEl ael) as ael_) =
+    List.foldl
+        (\child childAcc -> foldPreOrder step childAcc child)
+        (step ael_ acc)
+        ael.children
 
 
-foldPostOrder : (El -> acc -> acc) -> acc -> El -> acc
-foldPostOrder step acc el =
-    case el of
-        Container _ children ->
-            step el
-                (List.foldl
-                    (\child childAcc -> foldPostOrder step childAcc child)
-                    acc
-                    children
-                )
-
-        Text _ _ ->
-            step el acc
-
-        Empty ->
-            step el acc
+foldPostOrder : (AnnotatedEl -> acc -> acc) -> acc -> AnnotatedEl -> acc
+foldPostOrder step acc ((AEl ael) as ael_) =
+    step ael_
+        (List.foldl
+            (\child childAcc -> foldPostOrder step childAcc child)
+            acc
+            ael.children
+        )
 
 
-preOrder : El -> List El
+preOrder : AnnotatedEl -> List AnnotatedEl
 preOrder el =
     foldPreOrder (::) [] el
 
 
-postOrder : El -> List El
+postOrder : AnnotatedEl -> List AnnotatedEl
 postOrder el =
     foldPostOrder (::) [] el
 
 
-annotatedPreOrder : AnnotatedEl -> List AnnotatedEl
-annotatedPreOrder annotated =
-    case annotated of
-        AEl { children } ->
-            annotated :: List.concatMap annotatedPreOrder children
+mapPreOrder : (AnnotatedEl -> AnnotatedEl) -> AnnotatedEl -> AnnotatedEl
+mapPreOrder fn root =
+    let
+        (AEl root_) =
+            fn root
+    in
+    AEl { root_ | children = List.map fn root_.children }
 
 
-annotatedPostOrder : AnnotatedEl -> List AnnotatedEl
-annotatedPostOrder annotated =
-    case annotated of
-        AEl { children } ->
-            List.concatMap annotatedPostOrder children ++ [ annotated ]
+mapPostOrder : (AnnotatedEl -> AnnotatedEl) -> AnnotatedEl -> AnnotatedEl
+mapPostOrder fn (AEl root) =
+    let
+        root_ =
+            { root | children = List.map fn root.children }
+    in
+    fn (AEl root_)
+
+
+mapAccumPreOrder : (AnnotatedEl -> acc -> ( acc, AnnotatedEl )) -> acc -> AnnotatedEl -> ( acc, AnnotatedEl )
+mapAccumPreOrder fn acc ((AEl root) as root_) =
+    let
+        ( acc_, AEl root__ ) =
+            fn root_ acc
+
+        ( acc__, children ) =
+            List.foldl
+                (\child ( childAcc, doneChildren ) ->
+                    let
+                        ( childAcc_, child_ ) =
+                            mapAccumPreOrder fn childAcc child
+                    in
+                    ( childAcc_, child_ :: doneChildren )
+                )
+                ( acc, [] )
+                root.children
+    in
+    ( acc__, AEl { root__ | children = children } )
+
+
+mapAccumPostOrder : (AnnotatedEl -> acc -> ( acc, AnnotatedEl )) -> acc -> AnnotatedEl -> ( acc, AnnotatedEl )
+mapAccumPostOrder fn acc ((AEl root) as root_) =
+    let
+        ( acc_, children ) =
+            List.foldl
+                (\child ( childAcc, doneChildren ) ->
+                    let
+                        ( childAcc_, child_ ) =
+                            mapAccumPostOrder fn childAcc child
+                    in
+                    ( childAcc_, child_ :: doneChildren )
+                )
+                ( acc, [] )
+                root.children
+
+        ( acc__, AEl root__ ) =
+            fn root_ acc_
+    in
+    ( acc__, AEl { root__ | children = children } )
+
+
+
+-- Axis
+
+
+type alias Axis =
+    { sizeSpec : SizeSpec
+    , getSize : AnnotatedEl -> Int
+    , setSize : Int -> AnnotatedEl -> AnnotatedEl
+    , paddingStart : Int
+    , paddingEnd : Int
+    }
+
+
+horizAxis : AnnotatedElData -> Axis
+horizAxis ael =
+    { sizeSpec = ael.widthSpec
+    , getSize = \(AEl ael2) -> ael2.width
+    , setSize = \w (AEl ael2) -> AEl { ael2 | width = w }
+    , paddingStart = ael.paddingLeft
+    , paddingEnd = ael.paddingRight
+    }
+
+
+vertAxis : AnnotatedElData -> Axis
+vertAxis ael =
+    { sizeSpec = ael.heightSpec
+    , getSize = \(AEl ael2) -> ael2.height
+    , setSize = \h (AEl ael2) -> AEl { ael2 | height = h }
+    , paddingStart = ael.paddingTop
+    , paddingEnd = ael.paddingBottom
+    }
+
+
+axes : AnnotatedEl -> { along : Axis, across : Axis }
+axes (AEl ael) =
+    case ael.layoutDirection of
+        LeftToRight ->
+            { along = horizAxis ael
+            , across = vertAxis ael
+            }
+
+        TopToBottom ->
+            { along = vertAxis ael
+            , across = horizAxis ael
+            }
+
+
+
+----------
+
+
+sizeSpec : Size -> SizeSpec
+sizeSpec size =
+    case size of
+        Fixed n ->
+            SFixed n
+
+        Fit _ ->
+            SFit
+
+        Grow _ ->
+            SGrow
