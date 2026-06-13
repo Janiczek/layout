@@ -440,11 +440,13 @@ printout (AEl ael) =
                 Just a ->
                     fn a
     in
-    [ diff "x" .x String.fromInt
-    , diff "y" .y String.fromInt
-    , diff "width" .width String.fromInt
-    , diff "height" .height String.fromInt
-    , diff "children"
+    [ {- diff "x" .x String.fromInt
+         , diff "y" .y String.fromInt
+         , diff "width" .width String.fromInt
+         , diff "height" .height String.fromInt
+         ,
+      -}
+      diff "children"
         .children
         (\ch ->
             "\n"

@@ -1,5 +1,7 @@
 module TestHelpers exposing (default, el, elWithMaxDepth, expectEqualAnnotatedEl)
 
+import Diff
+import Diff.ToString
 import El exposing (..)
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer)
@@ -10,14 +12,22 @@ expectEqualAnnotatedEl expected actual =
     actual
         |> Expect.equal expected
         |> Expect.onFail
-            ([ "AnnotatedEls not equal:"
-             , "expected"
-             , El.printout actual
-             , "to equal"
-             , El.printout expected
+            ([ "AnnotatedEls not equal (red = expected, green = actual):"
+             , diffAnnotatedEls expected actual
              ]
                 |> String.join "\n\n"
             )
+
+
+diffAnnotatedEls : AnnotatedEl -> AnnotatedEl -> String
+diffAnnotatedEls expected actual =
+    Diff.diffLinesWith
+        (Diff.defaultOptions
+            |> Diff.ignoreLeadingWhitespace
+        )
+        (El.printout expected)
+        (El.printout actual)
+        |> Diff.ToString.diffToString { context = 10000, color = True }
 
 
 default : AnnotatedElData

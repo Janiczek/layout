@@ -18,5 +18,5 @@ layout c el =
         |> Step2.growShrinkSizingAlong c
         |> Step3.wrapText
         |> Step4.fitSizingAcross
-        |> Step5.growShrinkSizingAcross
+        |> Step5.growShrinkSizingAcross c
         |> Step6.positionAndAlign
