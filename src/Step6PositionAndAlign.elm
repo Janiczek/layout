@@ -20,16 +20,31 @@ positionAndAlign root =
             AEl
                 { ael
                     | children =
-                        List.foldl
-                            (\(AEl child) ( accChildren, accX, accY ) ->
-                                ( AEl { child | x = accX, y = accY } :: accChildren
-                                , accX + child.width
-                                , accY
-                                )
-                            )
-                            ( [], parentX, parentY )
-                            ael.children
-                            |> (\( newChildren, _, _ ) -> List.reverse newChildren)
+                        -- Not using El.axes as our acc x,y are positional
+                        case ael.layoutDirection of
+                            LeftToRight ->
+                                List.foldl
+                                    (\(AEl child) ( accChildren, accX, accY ) ->
+                                        ( AEl { child | x = accX, y = accY } :: accChildren
+                                        , accX + child.width
+                                        , accY
+                                        )
+                                    )
+                                    ( [], parentX, parentY )
+                                    ael.children
+                                    |> (\( newChildren, _, _ ) -> List.reverse newChildren)
+
+                            TopToBottom ->
+                                List.foldl
+                                    (\(AEl child) ( accChildren, accX, accY ) ->
+                                        ( AEl { child | x = accX, y = accY } :: accChildren
+                                        , accX
+                                        , accY + child.height
+                                        )
+                                    )
+                                    ( [], parentX, parentY )
+                                    ael.children
+                                    |> (\( newChildren, _, _ ) -> List.reverse newChildren)
                 }
         )
         root
