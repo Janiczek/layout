@@ -1,8 +1,35 @@
 module Step6PositionAndAlign exposing (positionAndAlign)
 
-import El exposing (AnnotatedEl, El(..))
+import El exposing (..)
 
 
 positionAndAlign : AnnotatedEl -> AnnotatedEl
-positionAndAlign ael =
-    Debug.todo "positionAndAlign"
+positionAndAlign root =
+    El.mapPreOrderWithParent
+        (\maybeParent ((AEl ael) as ael_) ->
+            -- each invocation will only change the children, not self
+            let
+                ( parentX, parentY ) =
+                    case maybeParent of
+                        Nothing ->
+                            ( 0, 0 )
+
+                        Just (AEl parent) ->
+                            ( parent.x, parent.y )
+            in
+            AEl
+                { ael
+                    | children =
+                        List.foldl
+                            (\(AEl child) ( accChildren, accX, accY ) ->
+                                ( AEl { child | x = accX, y = accY } :: accChildren
+                                , accX + child.width
+                                , accY
+                                )
+                            )
+                            ( [], parentX, parentY )
+                            ael.children
+                            |> (\( newChildren, _, _ ) -> List.reverse newChildren)
+                }
+        )
+        root
