@@ -63,7 +63,11 @@ suite =
                         )
         , Test.test "Three items without padding/gap - TB" <|
             \() ->
-                Container [ LayoutDirection TopToBottom ]
+                Container
+                    [ LayoutDirection TopToBottom
+                    , HorizAlign Left
+                    , VertAlign Top
+                    ]
                     [ Container [ Width (Fixed 50), Height (Fixed 70) ] []
                     , Container [ Width (Fixed 50), Height (Fixed 80) ] []
                     , Container [ Width (Fixed 50), Height (Fixed 90) ] []
@@ -77,6 +81,8 @@ suite =
                                 , y = 0
                                 , width = 50
                                 , height = 240
+                                , horizAlign = Left
+                                , vertAlign = Top
                                 , children =
                                     [ AEl { default | x = 0, y = 0, width = 50, widthSpec = SFixed 50, height = 70, heightSpec = SFixed 70 }
                                     , AEl { default | x = 0, y = 70, width = 50, widthSpec = SFixed 50, height = 80, heightSpec = SFixed 80 }

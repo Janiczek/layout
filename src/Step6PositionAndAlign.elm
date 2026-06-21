@@ -22,10 +22,12 @@ positionAndAlign root =
                             LeftToRight ->
                                 let
                                     extraWidth =
-                                        ael.width
-                                            - ael.paddingLeft
-                                            - ael.paddingRight
-                                            - List.sum (List.map (El.inner .width) ael.children)
+                                        max 0 <|
+                                            ael.width
+                                                - ael.paddingLeft
+                                                - ael.paddingRight
+                                                - List.sum (List.map (El.inner .width) ael.children)
+                                                - ((List.length ael.children - 1) * ael.childGap)
 
                                     offsetX =
                                         case ael.horizAlign of
@@ -41,7 +43,7 @@ positionAndAlign root =
                                 List.foldl
                                     (\(AEl child) ( accChildren, accX, accY ) ->
                                         let
-                                            whitespace =
+                                            whitespaceY =
                                                 ael.height
                                                     - ael.paddingTop
                                                     - ael.paddingBottom
@@ -53,10 +55,10 @@ positionAndAlign root =
                                                         0
 
                                                     VCenter ->
-                                                        whitespace // 2
+                                                        whitespaceY // 2
 
                                                     Bottom ->
-                                                        whitespace
+                                                        whitespaceY
                                         in
                                         ( AEl
                                             { child
@@ -75,10 +77,12 @@ positionAndAlign root =
                             TopToBottom ->
                                 let
                                     extraHeight =
-                                        ael.height
-                                            - ael.paddingTop
-                                            - ael.paddingBottom
-                                            - List.sum (List.map (El.inner .height) ael.children)
+                                        max 0 <|
+                                            ael.height
+                                                - ael.paddingTop
+                                                - ael.paddingBottom
+                                                - List.sum (List.map (El.inner .height) ael.children)
+                                                - ((List.length ael.children - 1) * ael.childGap)
 
                                     offsetY =
                                         case ael.vertAlign of
@@ -94,11 +98,11 @@ positionAndAlign root =
                                 List.foldl
                                     (\(AEl child) ( accChildren, accX, accY ) ->
                                         let
-                                            whitespace =
+                                            whitespaceX =
                                                 ael.width
-                                                    - ael.paddingTop
-                                                    - ael.paddingBottom
-                                                    - child.height
+                                                    - ael.paddingLeft
+                                                    - ael.paddingRight
+                                                    - child.width
 
                                             offsetX =
                                                 case ael.horizAlign of
@@ -106,10 +110,10 @@ positionAndAlign root =
                                                         0
 
                                                     HCenter ->
-                                                        whitespace // 2
+                                                        whitespaceX // 2
 
                                                     Right ->
-                                                        whitespace
+                                                        whitespaceX
                                         in
                                         ( AEl
                                             { child
