@@ -217,14 +217,14 @@ mapPreOrderWithParent fn root =
         aux : Maybe AnnotatedEl -> AnnotatedEl -> AnnotatedEl
         aux parent el =
             let
-                (AEl el_) =
+                ((AEl newEl_) as newEl) =
                     fn parent el
 
                 children =
-                    el_.children
-                        |> List.map (aux (Just root))
+                    newEl_.children
+                        |> List.map (aux (Just newEl))
             in
-            AEl { el_ | children = children }
+            AEl { newEl_ | children = children }
     in
     aux Nothing root
 

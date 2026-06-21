@@ -250,45 +250,44 @@ suite =
                                     ]
                             }
                         )
-        , Test.only <|
-            Test.test "grow parent of text should have width filled" <|
-                \() ->
-                    Container
-                        [ LayoutDirection LeftToRight
-                        , Width (Grow [])
+        , Test.test "grow parent of text should have width filled" <|
+            \() ->
+                Container
+                    [ LayoutDirection LeftToRight
+                    , Width (Grow [])
+                    ]
+                    [ Container
+                        [ Width (Grow []) -- this should have the viewport size
                         ]
-                        [ Container
-                            [ Width (Grow []) -- this should have the viewport size
-                            ]
-                            [ Text [] "Title" ]
-                        ]
-                        |> run
-                        |> TestHelpers.expectEqualAnnotatedEl
-                            (AEl
-                                { default
-                                    | widthSpec = SGrow
-                                    , width = 640
-                                    , heightSpec = SFit
-                                    , height = 0
-                                    , children =
-                                        [ AEl
-                                            { default
-                                                | widthSpec = SGrow
-                                                , heightSpec = SFit
-                                                , width = 640
-                                                , height = 0
-                                                , children =
-                                                    [ AEl
-                                                        { default
-                                                            | widthSpec = SFit
-                                                            , heightSpec = SFit
-                                                            , width = 0
-                                                            , height = 0
-                                                            , text = Just "Title"
-                                                        }
-                                                    ]
-                                            }
-                                        ]
-                                }
-                            )
+                        [ Text [] "Title" ]
+                    ]
+                    |> run
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | widthSpec = SGrow
+                                , width = 640
+                                , heightSpec = SFit
+                                , height = 0
+                                , children =
+                                    [ AEl
+                                        { default
+                                            | widthSpec = SGrow
+                                            , heightSpec = SFit
+                                            , width = 640
+                                            , height = 0
+                                            , children =
+                                                [ AEl
+                                                    { default
+                                                        | widthSpec = SFit
+                                                        , heightSpec = SFit
+                                                        , width = 0
+                                                        , height = 0
+                                                        , text = Just "Title"
+                                                    }
+                                                ]
+                                        }
+                                    ]
+                            }
+                        )
         ]

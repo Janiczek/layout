@@ -156,7 +156,7 @@ suite =
                                         { default
                                             | widthSpec = SGrow
                                             , heightSpec = SFit
-                                            , width = 0
+                                            , width = 640
                                             , height = 8
                                             , children =
                                                 [ AEl
