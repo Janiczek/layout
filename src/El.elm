@@ -12,9 +12,6 @@ module El exposing
     , preOrder, postOrder
     , mapPreOrder, mapPostOrder
     , mapPreOrderWithParent
-    , indexedMapPreOrder
-    , foldPreOrder, foldPostOrder
-    , mapAccumPreOrder, mapAccumPostOrder
     )
 
 {-|
@@ -34,69 +31,16 @@ module El exposing
 @docs preOrder, postOrder
 @docs mapPreOrder, mapPostOrder
 @docs mapPreOrderWithParent
-@docs indexedMapPreOrder
-@docs foldPreOrder, foldPostOrder
-@docs mapAccumPreOrder, mapAccumPostOrder
 
 ---
-
-
-## Notes for self:
-
-Immediate mode GUI in Elm via elements positioned
-strictly by transform: translate(x,y).
-
-<https://youtu.be/by9lQvpvMIc?t=837>
-
-Left/top offset = root padding left/top
-For each child:
-
-  - child position = root position + child position
-  - child position x/y += left/top offset
-  - draw
-  - left/top offset += child width/height + root child gap
-
-On visiting an element:
-
-On closing an element:
-
-  - element width += left padding + right padding
-  - element height += top padding + bottom padding
-  - ??? <https://youtu.be/by9lQvpvMIc?t=1030>
-      - child gap = (parent child count - 1) \* parent child gap
-  - depending on parent direction LR/TB:
-      - element width/height += child gap
-      - parent width/height += element width/height
-      - parent height/width = max(parent height/width, element height/width)
-      - parent minWidth/minHeight += element minWidth/minHeight
-      - parent minHeight/minWidth += max(child minHeight/minWidth, parent minHeight/minWidth)
-        Said more declaratively,
-  - parent size along layout axis = Sum of children
-  - parent size across layout axis = Max of children
-
-Going down (with children sizes being already done):
-parent width = parent left padding + parent right padding + sum of child widths + (children.length - 1) \* parent childGap
-parent height = parent top padding + parent bottom padding + max of child heights
-(or switched if direction TB)
-
-1.  Fit sizing along (depth first post order?)
-2.  Grow & shrink sizing along (breadth first)
-3.  Wrap text
-4.  Fit sizing across (depth first post order?)
-5.  Grow & shrink sizing across (breadth first)
-6.  Positions & alignment
-7.  Draw
 
 Width of grow() = technically 0 but could represent it as "Hasn't grown yet"
 
 Grow child elements:
 
   - remaining width = parent width - left+right paddings - child widths - all gaps
-
   - give the remaining width to all GROW children (not set! redistribute to them, +=)
-
   - remaining height = parent height - top+bottom paddings
-
   - give the remaining height to the GROW children
 
 Grow = while there is some remaining width: (<https://youtu.be/by9lQvpvMIc?t=1590>)
@@ -283,81 +227,6 @@ mapPreOrderWithParent fn root =
             AEl { el_ | children = children }
     in
     aux Nothing root
-
-
-{-| Run function on every AnnotatedEl in this tree.
-Depth-first pre-order: root is done before the children are done.
-Gives the function the index of the item (0 = root)
--}
-indexedMapPreOrder : (Int -> AnnotatedEl -> AnnotatedEl) -> AnnotatedEl -> AnnotatedEl
-indexedMapPreOrder fn root =
-    let
-        aux : Int -> AnnotatedEl -> ( AnnotatedEl, Int )
-        aux index el =
-            let
-                (AEl root_) =
-                    fn index root
-
-                ( children, newIndex ) =
-                    List.foldl
-                        (\child ( accChildren, accIndex ) ->
-                            let
-                                ( newChild, newAccIndex ) =
-                                    aux accIndex child
-                            in
-                            ( newChild :: accChildren, newAccIndex )
-                        )
-                        ( [], index + 1 )
-                        root_.children
-            in
-            ( AEl { root_ | children = children }
-            , newIndex
-            )
-    in
-    aux 0 root
-        |> Tuple.first
-
-
-mapAccumPreOrder : (AnnotatedEl -> acc -> ( acc, AnnotatedEl )) -> acc -> AnnotatedEl -> ( acc, AnnotatedEl )
-mapAccumPreOrder fn acc ((AEl root) as root_) =
-    let
-        ( acc_, AEl root__ ) =
-            fn root_ acc
-
-        ( acc__, children ) =
-            List.foldl
-                (\child ( childAcc, doneChildren ) ->
-                    let
-                        ( childAcc_, child_ ) =
-                            mapAccumPreOrder fn childAcc child
-                    in
-                    ( childAcc_, child_ :: doneChildren )
-                )
-                ( acc, [] )
-                root.children
-    in
-    ( acc__, AEl { root__ | children = children } )
-
-
-mapAccumPostOrder : (AnnotatedEl -> acc -> ( acc, AnnotatedEl )) -> acc -> AnnotatedEl -> ( acc, AnnotatedEl )
-mapAccumPostOrder fn acc ((AEl root) as root_) =
-    let
-        ( acc_, children ) =
-            List.foldl
-                (\child ( childAcc, doneChildren ) ->
-                    let
-                        ( childAcc_, child_ ) =
-                            mapAccumPostOrder fn childAcc child
-                    in
-                    ( childAcc_, child_ :: doneChildren )
-                )
-                ( acc, [] )
-                root.children
-
-        ( acc__, AEl root__ ) =
-            fn root_ acc_
-    in
-    ( acc__, AEl { root__ | children = children } )
 
 
 type alias Config =
