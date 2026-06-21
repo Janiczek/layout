@@ -9,6 +9,7 @@ import Html exposing (Html)
 import Html.Attributes
 import Html.Attributes.Extra
 import Html.Extra
+import Text
 
 
 render : AnnotatedEl -> Html msg
@@ -29,32 +30,20 @@ viewEl : AnnotatedEl -> Html msg
 viewEl (AEl el) =
     Html.div
         [ Html.Attributes.style "grid-area" "a"
-        , Html.Attributes.style "transform" ("translate2D(" ++ String.fromInt el.x ++ "," ++ String.fromInt el.y ++ ")")
-        , Html.Attributes.style "width" (String.fromInt el.width)
-        , Html.Attributes.style "height" (String.fromInt el.height)
+        , Html.Attributes.style "transform" ("translate(" ++ String.fromInt el.x ++ "px, " ++ String.fromInt el.y ++ "px)")
+        , Html.Attributes.style "width" (String.fromInt el.width ++ "px")
+        , Html.Attributes.style "height" (String.fromInt el.height ++ "px")
         , el.bgColor
             |> Html.Attributes.Extra.attributeMaybe
                 (\color ->
-                    Html.Attributes.style "background-color" <|
-                        case color of
-                            Blue ->
-                                "blue"
-
-                            Purple ->
-                                "purple"
-
-                            LightPurple ->
-                                "plum"
-
-                            Pink ->
-                                "pink"
-
-                            Yellow ->
-                                "yellow"
+                    Html.Attributes.style "background-color" <| El.colorToHtmlColor color
                 )
         ]
         [ el.text
             |> Html.Extra.viewMaybe
-                -- TODO pixel font
-                (\text -> Html.text text)
+                (Text.viewHtml
+                    (el.fontColor |> Maybe.withDefault Black)
+                    el.width
+                    el.height
+                )
         ]

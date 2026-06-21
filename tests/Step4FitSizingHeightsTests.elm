@@ -151,21 +151,21 @@ suite =
                                 | widthSpec = SGrow
                                 , width = 640
                                 , heightSpec = SFit
-                                , height = 8
+                                , height = 1 * Text.charHeight
                                 , children =
                                     [ AEl
                                         { default
                                             | widthSpec = SGrow
                                             , heightSpec = SFit
                                             , width = 640
-                                            , height = 8
+                                            , height = 1 * Text.charHeight
                                             , children =
                                                 [ AEl
                                                     { default
                                                         | widthSpec = SFit
                                                         , heightSpec = SFit
-                                                        , width = 30
-                                                        , height = 8
+                                                        , width = 5 * Text.charWidth
+                                                        , height = 1 * Text.charHeight
                                                         , text = Just "Title"
                                                     }
                                                 ]

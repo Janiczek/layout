@@ -6,7 +6,7 @@ module El exposing
     , LayoutDirection(..)
     , Size(..), SizeAttr(..), SizeSpec(..)
     , HorizAlign(..), VertAlign(..)
-    , Color(..)
+    , Color(..), colorToHtmlColor
     , TextAttr(..)
     , preOrder, postOrder
     , mapPreOrder, mapPostOrder
@@ -23,7 +23,7 @@ module El exposing
 @docs LayoutDirection
 @docs Size, SizeAttr, SizeSpec
 @docs HorizAlign, VertAlign
-@docs Color
+@docs Color, colorToHtmlColor
 @docs TextAttr
 
 @docs preOrder, postOrder
@@ -142,11 +142,34 @@ type SizeAttr
 
 
 type Color
-    = Purple
+    = Black
+    | Purple
     | LightPurple
     | Blue
     | Pink
     | Yellow
+
+
+colorToHtmlColor : Color -> String
+colorToHtmlColor c =
+    case c of
+        Black ->
+            "black"
+
+        Blue ->
+            "blue"
+
+        Yellow ->
+            "yellow"
+
+        Purple ->
+            "purple"
+
+        LightPurple ->
+            "plum"
+
+        Pink ->
+            "pink"
 
 
 type TextAttr
@@ -346,24 +369,6 @@ printout (AEl ael) =
 
                 Just a ->
                     fn a
-
-        colorToString : Color -> String
-        colorToString c =
-            case c of
-                Blue ->
-                    "Blue"
-
-                Yellow ->
-                    "Yellow"
-
-                Purple ->
-                    "Purple"
-
-                LightPurple ->
-                    "LightPurple"
-
-                Pink ->
-                    "Pink"
     in
     [ {- diff "x" .x String.fromInt
          , diff "y" .y String.fromInt
@@ -414,8 +419,8 @@ printout (AEl ael) =
     , diff "paddingBottom" .paddingBottom String.fromInt
     , diff "paddingLeft" .paddingLeft String.fromInt
     , diff "childGap" .childGap String.fromInt
-    , diff "bgColor" .bgColor (maybe colorToString)
-    , diff "fontColor" .fontColor (maybe colorToString)
+    , diff "bgColor" .bgColor (maybe colorToHtmlColor)
+    , diff "fontColor" .fontColor (maybe colorToHtmlColor)
     , diff "text" .text (maybe printoutText)
     , diff "children"
         .children

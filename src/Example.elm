@@ -1,4 +1,4 @@
-module Example exposing (buggy, holyGrail, main)
+module Example exposing (holyGrail, main)
 
 import El exposing (..)
 import Html exposing (Html)
@@ -14,32 +14,11 @@ main =
                 { layoutWidth = 640
                 , layoutHeight = 480
                 }
-                buggy
+                holyGrail
     in
     Html.div []
         [ Html.div [] [ Render.htmlTranslate annotated ]
         , Html.div [] [ Render.debug annotated ]
-        ]
-
-
-buggy : El
-buggy =
-    Container
-        [ LayoutDirection TopToBottom
-        , Width (Grow [])
-        , Height (Grow [])
-        ]
-        [ Container
-            [ LayoutDirection LeftToRight
-            , Width (Grow [])
-            ]
-            [ Container
-                [ Width (Grow []) ]
-                [ Text [] "Title" ]
-            , Container
-                []
-                [ Text [] "Login" ]
-            ]
         ]
 
 

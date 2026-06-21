@@ -294,27 +294,27 @@ suite =
                                             , children =
                                                 [ AEl
                                                     { default
-                                                        | width = 610
+                                                        | width = 640 - 5 * Text.charWidth
                                                         , height = 0
                                                         , widthSpec = SGrow
                                                         , children =
                                                             [ AEl
                                                                 { default
-                                                                    | width = 36
-                                                                    , height = 8
+                                                                    | width = 6 * Text.charWidth
+                                                                    , height = 1 * Text.charHeight
                                                                     , text = Just "TitleX"
                                                                 }
                                                             ]
                                                     }
                                                 , AEl
                                                     { default
-                                                        | width = 30
+                                                        | width = 5 * Text.charWidth
                                                         , height = 0
                                                         , children =
                                                             [ AEl
                                                                 { default
-                                                                    | width = 30
-                                                                    , height = 8
+                                                                    | width = 5 * Text.charWidth
+                                                                    , height = 1 * Text.charHeight
                                                                     , text = Just "Login"
                                                                 }
                                                             ]
