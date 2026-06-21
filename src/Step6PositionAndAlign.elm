@@ -18,7 +18,6 @@ positionAndAlign root =
             AEl
                 { ael
                     | children =
-                        -- Not using El.axes as our acc x,y are positional
                         case ael.layoutDirection of
                             LeftToRight ->
                                 List.foldl

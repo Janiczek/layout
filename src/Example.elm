@@ -123,6 +123,9 @@ holyGrail =
           Container
             [ Width (Grow [])
             , BgColor Purple
+            , Padding 8 8 8 8
+            , HorizAlign HCenter
+            , VertAlign VCenter
             ]
             [ Text [] "(c) 2026 MJ" ]
         ]

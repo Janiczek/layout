@@ -237,6 +237,9 @@ suite =
                       Container
                         [ Width (Grow [])
                         , BgColor Purple
+                        , Padding 8 8 8 8
+                        , HorizAlign HCenter
+                        , VertAlign VCenter
                         ]
                         [ Text [] "(c) 2026 MJ" ]
                     ]
@@ -373,17 +376,26 @@ suite =
                                       AEl
                                         { default
                                             | width = 640
-                                            , height = 8
+                                            , height = 24 -- 8 + 16
                                             , x = 0
-
-                                            -- , y = 504
+                                            , -- in principle, viewport height minus this element's height (it sticks to the bottom),
+                                              -- even though the layout algo will find this number via additive algorithm
+                                              y = 456
                                             , bgColor = Just Purple
                                             , widthSpec = SGrow
+                                            , paddingTop = 8
+                                            , paddingRight = 8
+                                            , paddingBottom = 8
+                                            , paddingLeft = 8
+                                            , horizAlign = HCenter
+                                            , vertAlign = VCenter
                                             , children =
                                                 [ AEl
                                                     { default
                                                         | width = 11 * Text.charWidth
                                                         , height = 1 * Text.charHeight
+                                                        , x = 287 -- 640/2 - 66/2
+                                                        , y = 464 -- 456 (container y) + 8 (container padding top)
                                                         , text = Just "(c) 2026 MJ"
                                                     }
                                                 ]

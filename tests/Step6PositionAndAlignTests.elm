@@ -509,4 +509,227 @@ suite =
                                     ]
                             }
                         )
+        , Test.test "VertAlign Top" <|
+            \() ->
+                Container
+                    [ VertAlign Top
+                    , HorizAlign Left
+                    , Width (Fixed 100)
+                    , Height (Fixed 100)
+                    ]
+                    [ Container
+                        [ Width (Fixed 10)
+                        , Height (Fixed 10)
+                        ]
+                        []
+                    ]
+                    |> run
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | vertAlign = Top
+                                , horizAlign = Left
+                                , widthSpec = SFixed 100
+                                , heightSpec = SFixed 100
+                                , width = 100
+                                , height = 100
+                                , children =
+                                    [ AEl
+                                        { default
+                                            | width = 10
+                                            , height = 10
+                                            , widthSpec = SFixed 10
+                                            , heightSpec = SFixed 10
+                                            , x = 0
+                                            , y = 0
+                                        }
+                                    ]
+                            }
+                        )
+        , Test.test "VertAlign VCenter" <|
+            \() ->
+                Container
+                    [ VertAlign VCenter
+                    , HorizAlign Left
+                    , Width (Fixed 100)
+                    , Height (Fixed 100)
+                    ]
+                    [ Container
+                        [ Width (Fixed 10)
+                        , Height (Fixed 10)
+                        ]
+                        []
+                    ]
+                    |> run
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | vertAlign = VCenter
+                                , horizAlign = Left
+                                , widthSpec = SFixed 100
+                                , heightSpec = SFixed 100
+                                , width = 100
+                                , height = 100
+                                , children =
+                                    [ AEl
+                                        { default
+                                            | width = 10
+                                            , height = 10
+                                            , widthSpec = SFixed 10
+                                            , heightSpec = SFixed 10
+                                            , x = 0
+                                            , y = 45 -- 100/2 - 10/2
+                                        }
+                                    ]
+                            }
+                        )
+        , Test.only <|
+            Test.test "VertAlign Bottom" <|
+                \() ->
+                    Container
+                        [ VertAlign Bottom
+                        , HorizAlign Left
+                        , Width (Fixed 100)
+                        , Height (Fixed 100)
+                        ]
+                        [ Container
+                            [ Width (Fixed 10)
+                            , Height (Fixed 10)
+                            ]
+                            []
+                        ]
+                        |> run
+                        |> TestHelpers.expectEqualAnnotatedEl
+                            (AEl
+                                { default
+                                    | vertAlign = Bottom
+                                    , horizAlign = Left
+                                    , widthSpec = SFixed 100
+                                    , heightSpec = SFixed 100
+                                    , width = 100
+                                    , height = 100
+                                    , children =
+                                        [ AEl
+                                            { default
+                                                | width = 10
+                                                , height = 10
+                                                , widthSpec = SFixed 10
+                                                , heightSpec = SFixed 10
+                                                , x = 0
+                                                , y = 90 -- 100 - 10
+                                            }
+                                        ]
+                                }
+                            )
+        , Test.test "HorizAlign Left" <|
+            \() ->
+                Container
+                    [ VertAlign Top
+                    , HorizAlign Left
+                    , Width (Fixed 100)
+                    , Height (Fixed 100)
+                    ]
+                    [ Container
+                        [ Width (Fixed 10)
+                        , Height (Fixed 10)
+                        ]
+                        []
+                    ]
+                    |> run
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | vertAlign = Top
+                                , horizAlign = Left
+                                , widthSpec = SFixed 100
+                                , heightSpec = SFixed 100
+                                , width = 100
+                                , height = 100
+                                , children =
+                                    [ AEl
+                                        { default
+                                            | width = 10
+                                            , height = 10
+                                            , widthSpec = SFixed 10
+                                            , heightSpec = SFixed 10
+                                            , x = 0
+                                            , y = 0
+                                        }
+                                    ]
+                            }
+                        )
+        , Test.test "HorizAlign HCenter" <|
+            \() ->
+                Container
+                    [ VertAlign Top
+                    , HorizAlign HCenter
+                    , Width (Fixed 100)
+                    , Height (Fixed 100)
+                    ]
+                    [ Container
+                        [ Width (Fixed 10)
+                        , Height (Fixed 10)
+                        ]
+                        []
+                    ]
+                    |> run
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | vertAlign = Top
+                                , horizAlign = HCenter
+                                , widthSpec = SFixed 100
+                                , heightSpec = SFixed 100
+                                , width = 100
+                                , height = 100
+                                , children =
+                                    [ AEl
+                                        { default
+                                            | width = 10
+                                            , height = 10
+                                            , widthSpec = SFixed 10
+                                            , heightSpec = SFixed 10
+                                            , x = 45 -- 100/2 - 10/2
+                                            , y = 0
+                                        }
+                                    ]
+                            }
+                        )
+        , Test.test "HorizAlign Right" <|
+            \() ->
+                Container
+                    [ VertAlign Top
+                    , HorizAlign Right
+                    , Width (Fixed 100)
+                    , Height (Fixed 100)
+                    ]
+                    [ Container
+                        [ Width (Fixed 10)
+                        , Height (Fixed 10)
+                        ]
+                        []
+                    ]
+                    |> run
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | vertAlign = Top
+                                , horizAlign = Right
+                                , widthSpec = SFixed 100
+                                , heightSpec = SFixed 100
+                                , width = 100
+                                , height = 100
+                                , children =
+                                    [ AEl
+                                        { default
+                                            | width = 10
+                                            , height = 10
+                                            , widthSpec = SFixed 10
+                                            , heightSpec = SFixed 10
+                                            , x = 90 -- 100 - 10
+                                            , y = 0
+                                        }
+                                    ]
+                            }
+                        )
         ]
