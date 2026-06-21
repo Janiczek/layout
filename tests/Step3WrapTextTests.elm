@@ -35,7 +35,9 @@ suite =
                     |> TestHelpers.expectEqualAnnotatedEl
                         (AEl
                             { default
-                                | children =
+                                | width = 5 * charWidth
+                                , height = 0
+                                , children =
                                     [ AEl
                                         { default
                                             | width = 5 * charWidth
@@ -45,6 +47,33 @@ suite =
                                     ]
                             }
                         )
+        , Test.fuzz
+            (Fuzz.asciiStringOfLengthBetween 1 10
+                |> Fuzz.map
+                    (String.map
+                        (\c ->
+                            if c == ' ' then
+                                'X'
+
+                            else
+                                c
+                        )
+                    )
+            )
+            "Text dimensions non-zero"
+          <|
+            \text ->
+                let
+                    ((AEl final) as final_) =
+                        Text [] text
+                            |> run
+                in
+                final
+                    |> Expect.all
+                        [ .width >> Expect.greaterThan 0
+                        , .height >> Expect.greaterThan 0
+                        ]
+                    |> Expect.onFail (El.printout final_)
         , Test.test "Short text without newlines in Fixed container doesn't wrap" <|
             \() ->
                 Container
@@ -79,7 +108,8 @@ suite =
                     |> TestHelpers.expectEqualAnnotatedEl
                         (AEl
                             { default
-                                | children =
+                                | width = String.length text * charWidth
+                                , children =
                                     [ AEl
                                         { default
                                             | width = String.length text * charWidth
@@ -168,6 +198,8 @@ suite =
                         (AEl
                             { default
                                 | widthSpec = SFit
+                                , width = 59 * charWidth
+                                , height = 0
                                 , children =
                                     [ AEl
                                         { default
@@ -212,6 +244,43 @@ suite =
                                                 ]
                                                     |> String.join "\n"
                                                     |> Just
+                                        }
+                                    ]
+                            }
+                        )
+        , Test.test "Text sizes its parent Fit container along the axis as well" <|
+            \() ->
+                Container
+                    [ Width (Grow [])
+                    , Height (Fixed 100)
+                    ]
+                    [ Container
+                        [ Width (Fit [])
+                        , Height (Fit [])
+                        ]
+                        [ Text [] "Hello" ]
+                    ]
+                    |> run
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | widthSpec = SGrow
+                                , heightSpec = SFixed 100
+                                , width = 640
+                                , height = 100
+                                , children =
+                                    [ AEl
+                                        { default
+                                            | width = 5 * charWidth
+                                            , height = 0
+                                            , children =
+                                                [ AEl
+                                                    { default
+                                                        | width = 5 * charWidth
+                                                        , height = 1 * charHeight
+                                                        , text = Just "Hello"
+                                                    }
+                                                ]
                                         }
                                     ]
                             }

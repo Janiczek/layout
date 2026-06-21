@@ -1,4 +1,4 @@
-module Example exposing (holyGrail, main)
+module Example exposing (header, holyGrail, main)
 
 import El exposing (..)
 import Html exposing (Html)
@@ -8,13 +8,30 @@ import Render
 
 main : Html msg
 main =
-    Render.htmlTranslate
-        (Layout.layout
-            { layoutWidth = 640
-            , layoutHeight = 480
-            }
-            holyGrail
-        )
+    let
+        annotated =
+            Layout.layout
+                { layoutWidth = 640
+                , layoutHeight = 480
+                }
+                header
+    in
+    Html.div []
+        [ Html.div [] [ Render.htmlTranslate annotated ]
+        , Html.div [] [ Render.debug annotated ]
+        ]
+
+
+header : El
+header =
+    Container
+        [ LayoutDirection LeftToRight
+        , Width (Grow [])
+        ]
+        [ Container
+            [ Width (Grow []) ]
+            [ Text [] "Title" ]
+        ]
 
 
 holyGrail : El

@@ -94,4 +94,65 @@ suite =
                                     ]
                             }
                         )
+        , Test.test "grow example from video - growth in both axes" <|
+            \() ->
+                Container
+                    [ Width (Fixed 1600)
+                    , Padding 32 32 32 32
+                    , ChildGap 32
+                    ]
+                    [ Container
+                        [ Width (Fixed 300)
+                        , Height (Fixed 300)
+                        ]
+                        []
+                    , Container
+                        [ Width (Grow [])
+                        , Height (Grow [])
+                        ]
+                        []
+                    , Container
+                        [ Width (Fixed 300)
+                        , Height (Fixed 300)
+                        ]
+                        []
+                    ]
+                    |> run
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | widthSpec = SFixed 1600
+                                , width = 1600
+                                , heightSpec = SFit
+                                , height = 364
+                                , paddingLeft = 32
+                                , paddingRight = 32
+                                , paddingTop = 32
+                                , paddingBottom = 32
+                                , childGap = 32
+                                , children =
+                                    [ AEl
+                                        { default
+                                            | widthSpec = SFixed 300
+                                            , heightSpec = SFixed 300
+                                            , width = 300
+                                            , height = 300
+                                        }
+                                    , AEl
+                                        { default
+                                            | widthSpec = SGrow
+                                            , heightSpec = SGrow
+                                            , width = 872
+                                            , height = 300
+                                        }
+                                    , AEl
+                                        { default
+                                            | widthSpec = SFixed 300
+                                            , heightSpec = SFixed 300
+                                            , width = 300
+                                            , height = 300
+                                        }
+                                    ]
+                            }
+                        )
         ]

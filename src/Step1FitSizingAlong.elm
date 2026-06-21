@@ -1,6 +1,7 @@
 module Step1FitSizingAlong exposing (fitSizingAlong)
 
 import El exposing (..)
+import Log
 
 
 fitSizingAlong : AnnotatedEl -> AnnotatedEl

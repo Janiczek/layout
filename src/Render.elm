@@ -1,4 +1,12 @@
-module Render exposing (htmlAbsolute, htmlCss, htmlGrid, htmlTranslate, svg, webgl)
+module Render exposing
+    ( debug
+    , htmlAbsolute
+    , htmlCss
+    , htmlGrid
+    , htmlTranslate
+    , svg
+    , webgl
+    )
 
 import Browser
 import Browser.Events
@@ -7,6 +15,7 @@ import Html exposing (Html)
 import Json.Decode exposing (Value)
 import Math.Matrix4 as Mat4 exposing (Mat4)
 import Math.Vector3 as Vec3 exposing (Vec3)
+import Render.Debug
 import Render.HtmlTranslate
 import WebGL exposing (Mesh, Shader)
 
@@ -39,3 +48,8 @@ htmlAbsolute ael =
 htmlGrid : AnnotatedEl -> Html msg
 htmlGrid ael =
     Debug.todo "htmlGrid"
+
+
+debug : AnnotatedEl -> Html msg
+debug ael =
+    Render.Debug.render ael

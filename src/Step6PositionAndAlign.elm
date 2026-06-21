@@ -1,6 +1,7 @@
 module Step6PositionAndAlign exposing (positionAndAlign)
 
 import El exposing (..)
+import Log
 
 
 positionAndAlign : AnnotatedEl -> AnnotatedEl

@@ -133,4 +133,43 @@ suite =
                                     ]
                             }
                         )
+        , Test.test "fit parent of text should have the dimension filled" <|
+            \() ->
+                Container
+                    [ LayoutDirection LeftToRight
+                    , Width (Grow [])
+                    ]
+                    [ Container
+                        [ Width (Grow []) ]
+                        [ Text [] "Title" ]
+                    ]
+                    |> run
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | widthSpec = SGrow
+                                , width = 640
+                                , heightSpec = SFit
+                                , height = 8
+                                , children =
+                                    [ AEl
+                                        { default
+                                            | widthSpec = SGrow
+                                            , heightSpec = SFit
+                                            , width = 0
+                                            , height = 8
+                                            , children =
+                                                [ AEl
+                                                    { default
+                                                        | widthSpec = SFit
+                                                        , heightSpec = SFit
+                                                        , width = 30
+                                                        , height = 8
+                                                        , text = Just "Title"
+                                                    }
+                                                ]
+                                        }
+                                    ]
+                            }
+                        )
         ]

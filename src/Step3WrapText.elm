@@ -8,6 +8,7 @@ TODO: some kind of line spacing - gap between lines? Fencepost formula
 -}
 
 import El exposing (..)
+import Log
 
 
 charWidth : Int
@@ -120,12 +121,37 @@ greedyGroupsOf maxLength str =
 
 wrapText : AnnotatedEl -> AnnotatedEl
 wrapText root =
-    El.mapPreOrderWithParent
+    El.mapPostOrderWithParent
         (\maybeParent ((AEl ael) as ael_) ->
             case ael.text of
                 Nothing ->
-                    -- not text
-                    ael_
+                    -- not text, but we might have had text descendants. We need to do the Fit phase again
+                    -- This mostly copies Step1 code.
+                    --
+                    -- TODO can we for example do the text sizing step first
+                    -- (between step0 and step1) and then do the Fit sizing just
+                    -- once? How does it interact with maxWidth?
+                    let
+                        { along } =
+                            El.axes ael_
+                    in
+                    case along.getSizeSpec ael_ of
+                        SFixed n ->
+                            -- These are already done and don't need to change (step1)
+                            ael_
+
+                        SFit ->
+                            ael_
+                                |> along.setSize
+                                    (List.sum (List.map along.getSize ael.children)
+                                        + along.getPaddingStart ael_
+                                        + along.getPaddingEnd ael_
+                                        + {- TODO PERF count them once in Step 0 -} (max 0 (List.length ael.children - 1) * ael.childGap)
+                                    )
+
+                        SGrow ->
+                            -- Do nothing in this step (Grow is handled elsewhere)
+                            ael_
 
                 Just text ->
                     let

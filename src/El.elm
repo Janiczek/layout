@@ -11,7 +11,7 @@ module El exposing
     , TextAttr(..)
     , preOrder, postOrder
     , mapPreOrder, mapPostOrder
-    , mapPreOrderWithParent
+    , mapPreOrderWithParent, mapPostOrderWithParent
     )
 
 {-|
@@ -30,7 +30,7 @@ module El exposing
 
 @docs preOrder, postOrder
 @docs mapPreOrder, mapPostOrder
-@docs mapPreOrderWithParent
+@docs mapPreOrderWithParent, mapPostOrderWithParent
 
 ---
 
@@ -225,6 +225,24 @@ mapPreOrderWithParent fn root =
                         |> List.map (aux (Just root))
             in
             AEl { el_ | children = children }
+    in
+    aux Nothing root
+
+
+{-| Run function on every AnnotatedEl in this tree.
+Depth-first post-order: root is done before the children are done.
+Gives the function the parent AnnotatedEl as well (Nothing = root)
+-}
+mapPostOrderWithParent : (Maybe AnnotatedEl -> AnnotatedEl -> AnnotatedEl) -> AnnotatedEl -> AnnotatedEl
+mapPostOrderWithParent fn root =
+    let
+        aux : Maybe AnnotatedEl -> AnnotatedEl -> AnnotatedEl
+        aux parent ((AEl el) as el_) =
+            let
+                newEl =
+                    { el | children = List.map (aux (Just el_)) el.children }
+            in
+            fn parent (AEl newEl)
     in
     aux Nothing root
 

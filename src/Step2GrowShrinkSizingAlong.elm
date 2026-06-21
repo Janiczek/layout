@@ -1,6 +1,7 @@
 module Step2GrowShrinkSizingAlong exposing (growShrinkSizingAlong)
 
 import El exposing (..)
+import Log
 
 
 growShrinkSizingAlong : Config -> AnnotatedEl -> AnnotatedEl
@@ -38,6 +39,5 @@ availableSize along ((AEl parent_) as parent) =
         - along.getPaddingStart parent
         - along.getPaddingEnd parent
         - -- TODO perf children count
-          -- TODO extract the fencepost formula?
           ((List.length parent_.children - 1) * parent_.childGap)
         - List.sum (List.map along.getSize parent_.children)

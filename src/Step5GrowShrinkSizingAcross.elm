@@ -1,6 +1,7 @@
 module Step5GrowShrinkSizingAcross exposing (growShrinkSizingAcross)
 
 import El exposing (..)
+import Log
 
 
 growShrinkSizingAcross : Config -> AnnotatedEl -> AnnotatedEl
