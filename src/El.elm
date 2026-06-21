@@ -1,10 +1,9 @@
 module El exposing
     ( El(..)
-    , AnnotatedEl(..), AnnotatedElData, empty, printout
+    , AnnotatedEl(..), AnnotatedElData, empty, printout, inner
     , Config
     , Attr(..)
     , LayoutDirection(..)
-    , Axis, axes
     , Size(..), SizeAttr(..), SizeSpec(..)
     , HorizAlign(..), VertAlign(..)
     , Color(..)
@@ -17,12 +16,11 @@ module El exposing
 {-|
 
 @docs El
-@docs AnnotatedEl, AnnotatedElData, empty, AnnotatedElPrintout, printout
+@docs AnnotatedEl, AnnotatedElData, empty, AnnotatedElPrintout, printout, inner
 @docs Config
 
 @docs Attr
 @docs LayoutDirection
-@docs Axis, axes
 @docs Size, SizeAttr, SizeSpec
 @docs HorizAlign, VertAlign
 @docs Color
@@ -82,9 +80,9 @@ type alias AnnotatedElData =
     , vertAlign : VertAlign
     , children : List AnnotatedEl
     , bgColor : Maybe Color
-    , fontSize : Maybe Int
     , childGap : Int
     , text : Maybe String
+    , fontColor : Maybe Color
     , widthSpec : SizeSpec
     , widthMin : Maybe Int
     , widthMax : Maybe Int
@@ -152,7 +150,7 @@ type Color
 
 
 type TextAttr
-    = FontSize Int
+    = FontColor Color
 
 
 foldPreOrder : (AnnotatedEl -> acc -> acc) -> acc -> AnnotatedEl -> acc
@@ -254,61 +252,6 @@ type alias Config =
 
 
 
--- Axis
-
-
-type alias Axis =
-    { getSizeSpec : AnnotatedEl -> SizeSpec
-    , getSize : AnnotatedEl -> Int
-    , setSize : Int -> AnnotatedEl -> AnnotatedEl
-    , getLayoutSize : Config -> Int
-    , getPaddingStart : AnnotatedEl -> Int
-    , getPaddingEnd : AnnotatedEl -> Int
-    }
-
-
-horizAxis : AnnotatedElData -> Axis
-horizAxis ael =
-    { getSizeSpec = inner .widthSpec
-    , getSize = inner .width
-    , setSize = \w (AEl ael2) -> AEl { ael2 | width = max 0 w }
-    , getLayoutSize = .layoutWidth
-    , getPaddingStart = inner .paddingLeft
-    , getPaddingEnd = inner .paddingRight
-    }
-
-
-vertAxis : AnnotatedElData -> Axis
-vertAxis ael =
-    { getSizeSpec = inner .heightSpec
-    , getSize = inner .height
-    , setSize = \h (AEl ael2) -> AEl { ael2 | height = max 0 h }
-    , getLayoutSize = .layoutHeight
-    , getPaddingStart = inner .paddingTop
-    , getPaddingEnd = inner .paddingBottom
-    }
-
-
-inner : (AnnotatedElData -> a) -> AnnotatedEl -> a
-inner fn (AEl ael) =
-    fn ael
-
-
-axes : AnnotatedEl -> { along : Axis, across : Axis }
-axes (AEl ael) =
-    case ael.layoutDirection of
-        LeftToRight ->
-            { along = horizAxis ael
-            , across = vertAxis ael
-            }
-
-        TopToBottom ->
-            { along = vertAxis ael
-            , across = horizAxis ael
-            }
-
-
-
 ----------
 
 
@@ -334,7 +277,7 @@ empty =
     , paddingLeft = 0
     , childGap = 0
     , bgColor = Nothing
-    , fontSize = Nothing
+    , fontColor = Nothing
     , text = Nothing
     }
 
@@ -403,6 +346,24 @@ printout (AEl ael) =
 
                 Just a ->
                     fn a
+
+        colorToString : Color -> String
+        colorToString c =
+            case c of
+                Blue ->
+                    "Blue"
+
+                Yellow ->
+                    "Yellow"
+
+                Purple ->
+                    "Purple"
+
+                LightPurple ->
+                    "LightPurple"
+
+                Pink ->
+                    "Pink"
     in
     [ {- diff "x" .x String.fromInt
          , diff "y" .y String.fromInt
@@ -410,16 +371,7 @@ printout (AEl ael) =
          , diff "height" .height String.fromInt
          ,
       -}
-      diff "children"
-        .children
-        (\ch ->
-            "\n"
-                ++ (ch
-                        |> List.map (\child -> printout child |> indent 4)
-                        |> String.join ",\n"
-                   )
-        )
-    , diff "layoutDirection"
+      diff "layoutDirection"
         .layoutDirection
         (\ld ->
             case ld of
@@ -462,29 +414,18 @@ printout (AEl ael) =
     , diff "paddingBottom" .paddingBottom String.fromInt
     , diff "paddingLeft" .paddingLeft String.fromInt
     , diff "childGap" .childGap String.fromInt
-    , diff "bgColor"
-        .bgColor
-        (maybe
-            (\c ->
-                case c of
-                    Blue ->
-                        "Blue"
-
-                    Yellow ->
-                        "Yellow"
-
-                    Purple ->
-                        "Purple"
-
-                    LightPurple ->
-                        "LightPurple"
-
-                    Pink ->
-                        "Pink"
-            )
-        )
-    , diff "fontSize" .fontSize (maybe String.fromInt)
+    , diff "bgColor" .bgColor (maybe colorToString)
+    , diff "fontColor" .fontColor (maybe colorToString)
     , diff "text" .text (maybe printoutText)
+    , diff "children"
+        .children
+        (\ch ->
+            "\n"
+                ++ (ch
+                        |> List.map (\child -> printout child |> indent 4)
+                        |> String.join ",\n"
+                   )
+        )
     ]
         |> List.filterMap identity
         |> List.map (\s -> "  " ++ s)
@@ -504,3 +445,8 @@ indent n str =
         |> String.lines
         |> List.map (\s -> String.repeat n " " ++ s)
         |> String.join "\n"
+
+
+inner : (AnnotatedElData -> a) -> AnnotatedEl -> a
+inner fn (AEl ael) =
+    fn ael

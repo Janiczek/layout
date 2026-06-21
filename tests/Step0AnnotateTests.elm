@@ -6,6 +6,7 @@ import Fuzz
 import Step0Annotate as Step0
 import Test exposing (Test)
 import TestHelpers exposing (default)
+import Text
 
 
 suite : Test
@@ -36,14 +37,14 @@ suite =
                         [ Width (Grow [])
                         , BgColor LightPurple
                         ]
-                        [ Text [ FontSize 18 ] "Copy"
+                        [ Text [ FontColor Blue ] "Copy"
                         , Container [] [ Text [] "copy" ]
                         ]
                     , Container
                         [ Width (Grow [])
                         , BgColor LightPurple
                         ]
-                        [ Text [ FontSize 18 ] "Paste"
+                        [ Text [ FontColor Pink ] "Paste"
                         , Container [] [ Text [] "paste" ]
                         ]
                     ]
@@ -59,11 +60,23 @@ suite =
                                             | bgColor = Just LightPurple
                                             , widthSpec = SGrow
                                             , children =
-                                                [ AEl { default | fontSize = Just 18, text = Just "Copy" }
+                                                [ AEl
+                                                    { default
+                                                        | fontColor = Just Blue
+                                                        , text = Just "Copy"
+                                                        , width = 4 * Text.charWidth
+                                                        , height = 1 * Text.charHeight
+                                                    }
                                                 , AEl
                                                     { default
                                                         | children =
-                                                            [ AEl { default | text = Just "copy" } ]
+                                                            [ AEl
+                                                                { default
+                                                                    | text = Just "copy"
+                                                                    , width = 4 * Text.charWidth
+                                                                    , height = 1 * Text.charHeight
+                                                                }
+                                                            ]
                                                     }
                                                 ]
                                         }
@@ -72,11 +85,23 @@ suite =
                                             | bgColor = Just LightPurple
                                             , widthSpec = SGrow
                                             , children =
-                                                [ AEl { default | fontSize = Just 18, text = Just "Paste" }
+                                                [ AEl
+                                                    { default
+                                                        | fontColor = Just Pink
+                                                        , text = Just "Paste"
+                                                        , width = 5 * Text.charWidth
+                                                        , height = 1 * Text.charHeight
+                                                    }
                                                 , AEl
                                                     { default
                                                         | children =
-                                                            [ AEl { default | text = Just "paste" } ]
+                                                            [ AEl
+                                                                { default
+                                                                    | text = Just "paste"
+                                                                    , width = 5 * Text.charWidth
+                                                                    , height = 1 * Text.charHeight
+                                                                }
+                                                            ]
                                                     }
                                                 ]
                                         }
@@ -138,7 +163,7 @@ suite =
                 input
                     |> Step0.annotate
                     |> El.preOrder
-                    |> List.all isZeroed
+                    |> List.all nonTextIsZeroed
                     |> Expect.equal True
 
         -- TODO properties are preserved (except for padding, childGap which are non-negative)
@@ -152,17 +177,44 @@ suite =
                     |> Step0.annotate
                     |> childrenPreserved el
                     |> Expect.equal True
+        , Test.test "Single-line text is measured" <|
+            \() ->
+                Text [] "Abcde"
+                    |> Step0.annotate
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | width = 5 * Text.charWidth
+                                , height = 1 * Text.charHeight
+                                , text = Just "Abcde"
+                            }
+                        )
+        , Test.test "Multi-line text is measured" <|
+            \() ->
+                Text [] "Abcde\nxyz\n\nDEFGHIJKL"
+                    |> Step0.annotate
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | width = 9 * Text.charWidth
+                                , height = 4 * Text.charHeight
+                                , text = Just "Abcde\nxyz\n\nDEFGHIJKL"
+                            }
+                        )
         ]
 
 
-isZeroed : AnnotatedEl -> Bool
-isZeroed annotated =
-    case annotated of
-        AEl { x, y, width, height } ->
+nonTextIsZeroed : AnnotatedEl -> Bool
+nonTextIsZeroed (AEl { text, x, y, width, height }) =
+    case text of
+        Nothing ->
             (x == 0)
                 && (y == 0)
                 && (width == 0)
                 && (height == 0)
+
+        Just _ ->
+            True
 
 
 childrenPreserved : El -> AnnotatedEl -> Bool

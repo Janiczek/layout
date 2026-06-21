@@ -1,4 +1,4 @@
-module TestHelpers exposing (default, el, elWithMaxDepth, expectEqualAnnotatedEl)
+module TestHelpers exposing (default, el, elWithMaxDepth, expectEqualAnnotatedEl, layoutDirectionFuzzer)
 
 import Diff
 import Diff.ToString

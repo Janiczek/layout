@@ -1,17 +1,18 @@
-module Step5GrowShrinkSizingAcrossTests exposing (suite)
+module Step5GrowShrinkSizingHeightsTests exposing (suite)
 
 import El exposing (..)
 import Expect
 import Fuzz
 import Log
 import Step0Annotate as Step0
-import Step1FitSizingAlong as Step1
-import Step2GrowShrinkSizingAlong as Step2
-import Step3WrapText as Step3 exposing (charHeight, charWidth)
-import Step4FitSizingAcross as Step4
-import Step5GrowShrinkSizingAcross as Step5
+import Step1FitSizingWidths as Step1
+import Step2GrowShrinkSizingWidths as Step2
+import Step3WrapText as Step3
+import Step4FitSizingHeights as Step4
+import Step5GrowShrinkSizingHeights as Step5
 import Test exposing (Test)
 import TestHelpers exposing (default)
+import Text
 
 
 config : Config
@@ -25,16 +26,16 @@ run : El -> AnnotatedEl
 run el =
     el
         |> Step0.annotate
-        |> Step1.fitSizingAlong
-        |> Step2.growShrinkSizingAlong config
+        |> Step1.fitSizingWidths
+        |> Step2.growShrinkSizingWidths config
         |> Step3.wrapText
-        |> Step4.fitSizingAcross
-        |> Step5.growShrinkSizingAcross config
+        |> Step4.fitSizingHeights
+        |> Step5.growShrinkSizingHeights config
 
 
 suite : Test
 suite =
-    Test.describe "Step5.growShrinkSizingAcross"
+    Test.describe "Step5.growShrinkSizingHeights"
         [ Test.test "Example from video" <|
             \() ->
                 Container
@@ -151,6 +152,73 @@ suite =
                                             , heightSpec = SFixed 300
                                             , width = 300
                                             , height = 300
+                                        }
+                                    ]
+                            }
+                        )
+        , Test.test "regression - part of holy grail - TB root, LR child not growing properly" <|
+            \() ->
+                Container
+                    [ LayoutDirection TopToBottom
+                    , Width (Grow [])
+                    , Height (Grow [])
+                    ]
+                    [ Container
+                        [ LayoutDirection LeftToRight
+                        , Width (Grow [])
+                        ]
+                        [ Container
+                            [ Width (Grow []) ]
+                            [ Text [] "TitleX" ]
+                        , Container
+                            []
+                            [ Text [] "Login" ]
+                        ]
+                    ]
+                    |> run
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | layoutDirection = TopToBottom
+                                , width = 640
+                                , height = 480
+                                , widthSpec = SGrow
+                                , heightSpec = SGrow
+                                , children =
+                                    [ AEl
+                                        { default
+                                            | width = 640
+                                            , height = 8
+                                            , widthSpec = SGrow
+                                            , children =
+                                                [ AEl
+                                                    { default
+                                                        | width = 610
+                                                        , height = 8
+                                                        , widthSpec = SGrow
+                                                        , children =
+                                                            [ AEl
+                                                                { default
+                                                                    | width = 36
+                                                                    , height = 8
+                                                                    , text = Just "TitleX"
+                                                                }
+                                                            ]
+                                                    }
+                                                , AEl
+                                                    { default
+                                                        | width = 30
+                                                        , height = 8
+                                                        , children =
+                                                            [ AEl
+                                                                { default
+                                                                    | width = 30
+                                                                    , height = 8
+                                                                    , text = Just "Login"
+                                                                }
+                                                            ]
+                                                    }
+                                                ]
                                         }
                                     ]
                             }

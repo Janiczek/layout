@@ -10,13 +10,10 @@ positionAndAlign root =
         (\maybeParent ((AEl ael) as ael_) ->
             -- each invocation will only change the children, not self
             let
-                ( parentX, parentY ) =
-                    case maybeParent of
-                        Nothing ->
-                            ( 0, 0 )
-
-                        Just (AEl parent) ->
-                            ( parent.x, parent.y )
+                ( startX, startY ) =
+                    ( ael.x + ael.paddingLeft
+                    , ael.y + ael.paddingTop
+                    )
             in
             AEl
                 { ael
@@ -26,24 +23,34 @@ positionAndAlign root =
                             LeftToRight ->
                                 List.foldl
                                     (\(AEl child) ( accChildren, accX, accY ) ->
-                                        ( AEl { child | x = accX, y = accY } :: accChildren
-                                        , accX + child.width
+                                        ( AEl
+                                            { child
+                                                | x = accX
+                                                , y = accY
+                                            }
+                                            :: accChildren
+                                        , accX + child.width + ael.childGap
                                         , accY
                                         )
                                     )
-                                    ( [], parentX, parentY )
+                                    ( [], startX, startY )
                                     ael.children
                                     |> (\( newChildren, _, _ ) -> List.reverse newChildren)
 
                             TopToBottom ->
                                 List.foldl
                                     (\(AEl child) ( accChildren, accX, accY ) ->
-                                        ( AEl { child | x = accX, y = accY } :: accChildren
+                                        ( AEl
+                                            { child
+                                                | x = accX
+                                                , y = accY
+                                            }
+                                            :: accChildren
                                         , accX
-                                        , accY + child.height
+                                        , accY + child.height + ael.childGap
                                         )
                                     )
-                                    ( [], parentX, parentY )
+                                    ( [], startX, startY )
                                     ael.children
                                     |> (\( newChildren, _, _ ) -> List.reverse newChildren)
                 }

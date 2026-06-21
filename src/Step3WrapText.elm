@@ -1,6 +1,9 @@
-module Step3WrapText exposing (charHeight, charWidth, wrapText)
+module Step3WrapText exposing (wrapText)
 
-{-| TODO: monospace fonts only for now, to simplify the text bbox computation aspect of things.
+{-| Measure size of text and wrap the text according to max width constraints.
+Also propagate the new widths to the ancestors.
+
+TODO: monospace fonts only for now, to simplify the text bbox computation aspect of things.
 Later we can try to figure out how to read TTF fonts or simple proportional bitmap fonts.
 
 TODO: some kind of line spacing - gap between lines? Fencepost formula
@@ -9,16 +12,7 @@ TODO: some kind of line spacing - gap between lines? Fencepost formula
 
 import El exposing (..)
 import Log
-
-
-charWidth : Int
-charWidth =
-    6
-
-
-charHeight : Int
-charHeight =
-    8
+import Text
 
 
 {-| Wraps at any character instead of spaces, hyphens etc.
@@ -67,7 +61,7 @@ wrapAnywhereUnchecked { maxWidth, text } =
         maxCharsPerLine =
             -- eg. 250px fits 41 6px chars
             maxWidth
-                |> Maybe.map (\pWidth -> pWidth // charWidth)
+                |> Maybe.map (\pWidth -> pWidth // Text.charWidth)
 
         lines =
             case maxCharsPerLine of
@@ -78,20 +72,13 @@ wrapAnywhereUnchecked { maxWidth, text } =
                     textLines
                         -- this depends on wrapAnywhere checking the "no width available" case for us
                         |> List.concatMap (greedyGroupsOf maxChars)
+
+        { width, height } =
+            Text.measure lines
     in
     { lines = lines
-    , width =
-        -- TODO horiz spacing between chars?
-        lines
-            |> List.map String.length
-            |> List.maximum
-            |> Maybe.withDefault 0
-            |> (*) charWidth
-    , height =
-        -- TODO figure out line height later
-        lines
-            |> List.length
-            |> (*) charHeight
+    , width = width
+    , height = height
     }
 
 
@@ -124,40 +111,8 @@ wrapText root =
     El.mapPostOrderWithParent
         (\maybeParent ((AEl ael) as ael_) ->
             case ael.text of
-                Nothing ->
-                    -- not text, but we might have had text descendants. We need to do the Fit phase again
-                    -- This mostly copies Step1 code.
-                    --
-                    -- TODO can we for example do the text sizing step first
-                    -- (between step0 and step1) and then do the Fit sizing just
-                    -- once? How does it interact with maxWidth?
-                    let
-                        { along } =
-                            El.axes ael_
-                    in
-                    case along.getSizeSpec ael_ of
-                        SFixed n ->
-                            -- These are already done and don't need to change (step1)
-                            ael_
-
-                        SFit ->
-                            ael_
-                                |> along.setSize
-                                    (List.sum (List.map along.getSize ael.children)
-                                        + along.getPaddingStart ael_
-                                        + along.getPaddingEnd ael_
-                                        + {- TODO PERF count them once in Step 0 -} (max 0 (List.length ael.children - 1) * ael.childGap)
-                                    )
-
-                        SGrow ->
-                            -- Do nothing in this step (Grow is handled elsewhere)
-                            ael_
-
                 Just text ->
                     let
-                        { along } =
-                            El.axes ael_
-
                         { lines, width, height } =
                             -- TODO widthMax? widthMin?
                             wrapAnywhere
@@ -165,7 +120,7 @@ wrapText root =
                                     maybeParent
                                         |> Maybe.andThen
                                             (\((AEl parent) as parent_) ->
-                                                case along.getSizeSpec parent_ of
+                                                case parent.widthSpec of
                                                     SFit ->
                                                         -- ?
                                                         Nothing
@@ -175,7 +130,7 @@ wrapText root =
                                                         Nothing
 
                                                     SFixed n ->
-                                                        -- TODO maybe along.getSize? (width/height)
+                                                        -- TODO maybe parent.width?
                                                         Just n
                                             )
                                 , text = text
@@ -187,5 +142,44 @@ wrapText root =
                             , height = height
                             , text = Just (lines |> String.join "\n")
                         }
+
+                Nothing ->
+                    -- Propagate the new widths
+                    -- This mostly copies step 1.
+                    case ael.widthSpec of
+                        SFixed n ->
+                            -- Don't deal with Fixed here - we have done that in step 1.
+                            ael_
+
+                        SGrow ->
+                            -- Don't deal with Grow here - we have done that in step 1.
+                            ael_
+
+                        SFit ->
+                            -- TODO can we do things in a less "throw away the
+                            -- original computation" way? Only propagate where
+                            -- it makes sense?
+                            AEl
+                                { ael
+                                    | width =
+                                        let
+                                            childWidths =
+                                                ael.children
+                                                    |> List.map (El.inner .width)
+                                        in
+                                        (case ael.layoutDirection of
+                                            LeftToRight ->
+                                                List.sum childWidths
+                                                    + -- TODO PERF count them once in Step 0
+                                                      max 0 ((List.length ael.children - 1) * ael.childGap)
+
+                                            TopToBottom ->
+                                                List.maximum childWidths
+                                                    |> Maybe.withDefault 0
+                                        )
+                                            + ael.paddingLeft
+                                            + ael.paddingRight
+                                }
         )
         root
+        |> Log.annotatedEl "step 3 - wrap text"

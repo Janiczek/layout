@@ -1,4 +1,4 @@
-module Example exposing (header, holyGrail, main)
+module Example exposing (buggy, holyGrail, main)
 
 import El exposing (..)
 import Html exposing (Html)
@@ -14,7 +14,7 @@ main =
                 { layoutWidth = 640
                 , layoutHeight = 480
                 }
-                header
+                buggy
     in
     Html.div []
         [ Html.div [] [ Render.htmlTranslate annotated ]
@@ -22,15 +22,24 @@ main =
         ]
 
 
-header : El
-header =
+buggy : El
+buggy =
     Container
-        [ LayoutDirection LeftToRight
+        [ LayoutDirection TopToBottom
         , Width (Grow [])
+        , Height (Grow [])
         ]
         [ Container
-            [ Width (Grow []) ]
-            [ Text [] "Title" ]
+            [ LayoutDirection LeftToRight
+            , Width (Grow [])
+            ]
+            [ Container
+                [ Width (Grow []) ]
+                [ Text [] "Title" ]
+            , Container
+                []
+                [ Text [] "Login" ]
+            ]
         ]
 
 
@@ -54,7 +63,7 @@ holyGrail =
                 [ Width (Grow []) ]
                 [ Text [] "Title" ]
             , -- login
-              Container [] [ Text [] "Login" ]
+              Text [] "Login"
             ]
         , -- main
           Container
@@ -62,8 +71,7 @@ holyGrail =
             , Width (Grow [])
             , Height (Grow [])
             ]
-            [ -- TODO write these examples (some text) in all 3 center areas
-              -- left rail
+            [ -- left rail
               Container
                 [ LayoutDirection TopToBottom
                 , Height (Grow [])

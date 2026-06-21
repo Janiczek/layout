@@ -1,6 +1,11 @@
 module Step0Annotate exposing (annotate)
 
+{-| Convert El to AnnotatedEl, with mostly nonsensical 0 widths, heights and x,y positions.
+At this point we can measure text elements' unwrapped widths and heights. (They will change later in step 3.)
+-}
+
 import El exposing (..)
+import Text
 
 
 annotate : El -> AnnotatedEl
@@ -18,6 +23,7 @@ annotate el =
                     applyTextAttr
                     { empty | text = Just text }
                     attrs
+                    |> measureText text
 
             Empty ->
                 empty
@@ -87,8 +93,8 @@ applyAttr attr el =
 applyTextAttr : TextAttr -> AnnotatedElData -> AnnotatedElData
 applyTextAttr attr el =
     case attr of
-        FontSize size ->
-            { el | fontSize = Just size }
+        FontColor color ->
+            { el | fontColor = Just color }
 
 
 applyWidthSizeAttr : SizeAttr -> AnnotatedElData -> AnnotatedElData
@@ -109,3 +115,19 @@ applyHeightSizeAttr attr el =
 
         Max n ->
             { el | heightMax = Just (max 0 n) }
+
+
+measureText : String -> AnnotatedElData -> AnnotatedElData
+measureText text el =
+    let
+        lines : List String
+        lines =
+            String.lines text
+
+        { width, height } =
+            Text.measure lines
+    in
+    { el
+        | width = width
+        , height = height
+    }

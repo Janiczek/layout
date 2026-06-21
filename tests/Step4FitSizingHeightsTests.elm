@@ -1,34 +1,35 @@
-module Step4FitSizingAcrossTests exposing (suite)
+module Step4FitSizingHeightsTests exposing (suite)
 
 import El exposing (..)
 import Expect
 import Fuzz
 import Log
 import Step0Annotate as Step0
-import Step1FitSizingAlong as Step1
-import Step2GrowShrinkSizingAlong as Step2
-import Step3WrapText as Step3 exposing (charHeight, charWidth)
-import Step4FitSizingAcross as Step4
+import Step1FitSizingWidths as Step1
+import Step2GrowShrinkSizingWidths as Step2
+import Step3WrapText as Step3
+import Step4FitSizingHeights as Step4
 import Test exposing (Test)
 import TestHelpers exposing (default)
+import Text
 
 
 run : El -> AnnotatedEl
 run el =
     el
         |> Step0.annotate
-        |> Step1.fitSizingAlong
-        |> Step2.growShrinkSizingAlong
+        |> Step1.fitSizingWidths
+        |> Step2.growShrinkSizingWidths
             { layoutWidth = 640
             , layoutHeight = 480
             }
         |> Step3.wrapText
-        |> Step4.fitSizingAcross
+        |> Step4.fitSizingHeights
 
 
 suite : Test
 suite =
-    Test.describe "Step4.fitSizingAcross"
+    Test.describe "Step4.fitSizingHeights"
         [ Test.test "Fit LR container with fixed children - height (across) filled in" <|
             \() ->
                 Container

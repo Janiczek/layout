@@ -1,21 +1,22 @@
-module Step2GrowShrinkSizingAlongTests exposing (suite)
+module Step2GrowShrinkSizingWidthsTests exposing (suite)
 
 import El exposing (..)
 import Expect
 import Fuzz
 import Step0Annotate as Step0
-import Step1FitSizingAlong as Step1
-import Step2GrowShrinkSizingAlong as Step2
+import Step1FitSizingWidths as Step1
+import Step2GrowShrinkSizingWidths as Step2
 import Test exposing (Test)
 import TestHelpers exposing (default)
+import Text
 
 
 run : El -> AnnotatedEl
 run el =
     el
         |> Step0.annotate
-        |> Step1.fitSizingAlong
-        |> Step2.growShrinkSizingAlong
+        |> Step1.fitSizingWidths
+        |> Step2.growShrinkSizingWidths
             { layoutWidth = 640
             , layoutHeight = 480
             }
@@ -23,13 +24,18 @@ run el =
 
 suite : Test
 suite =
-    Test.describe "Step2.growShrinkSizingAlong"
-        [ Test.test "default container -> still 0" <|
+    Test.describe "Step2.growShrinkSizingWidths"
+        [ Test.test "default container -> width still 0" <|
             \() ->
                 Container [] []
                     |> run
-                    |> TestHelpers.expectEqualAnnotatedEl (AEl default)
-        , Test.test "fit container -> still 0" <|
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | width = 0
+                            }
+                        )
+        , Test.test "fit container -> width still 0" <|
             \() ->
                 Container
                     [ Height (Fit [])
@@ -37,13 +43,18 @@ suite =
                     ]
                     []
                     |> run
-                    |> TestHelpers.expectEqualAnnotatedEl (AEl default)
-        , Test.test "grow root -> takes layout size - LR" <|
-            \() ->
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | width = 0
+                            }
+                        )
+        , Test.fuzz TestHelpers.layoutDirectionFuzzer "grow root -> takes layout width" <|
+            \ld ->
                 Container
                     [ Height (Grow [])
                     , Width (Grow [])
-                    , LayoutDirection LeftToRight
+                    , LayoutDirection ld
                     ]
                     []
                     |> run
@@ -52,36 +63,19 @@ suite =
                             { default
                                 | heightSpec = SGrow
                                 , widthSpec = SGrow
+                                , layoutDirection = ld
                                 , width = 640
                             }
                         )
-        , Test.test "grow root -> takes layout size - TB" <|
-            \() ->
-                Container
-                    [ Height (Grow [])
-                    , Width (Grow [])
-                    , LayoutDirection TopToBottom
-                    ]
-                    []
-                    |> run
-                    |> TestHelpers.expectEqualAnnotatedEl
-                        (AEl
-                            { default
-                                | heightSpec = SGrow
-                                , widthSpec = SGrow
-                                , layoutDirection = TopToBottom
-                                , height = 480
-                            }
-                        )
-        , Test.test "grow child -> takes parent size - LR" <|
-            \() ->
+        , Test.fuzz TestHelpers.layoutDirectionFuzzer "grow child -> takes parent width" <|
+            \ld ->
                 Container
                     [ Height (Fixed 300)
                     , Width (Fixed 200)
                     ]
                     [ Container
                         [ Width (Grow [])
-                        , LayoutDirection LeftToRight
+                        , LayoutDirection ld
                         ]
                         []
                     ]
@@ -92,42 +86,13 @@ suite =
                                 | heightSpec = SFixed 300
                                 , widthSpec = SFixed 200
                                 , width = 200
-                                , height = 300
+                                , height = 0
                                 , children =
                                     [ AEl
                                         { default
                                             | widthSpec = SGrow
                                             , width = 200
-                                        }
-                                    ]
-                            }
-                        )
-        , Test.test "grow child -> takes parent size - TB" <|
-            \() ->
-                Container
-                    [ Height (Fixed 300)
-                    , Width (Fixed 200)
-                    ]
-                    [ Container
-                        [ Height (Grow [])
-                        , LayoutDirection TopToBottom
-                        ]
-                        []
-                    ]
-                    |> run
-                    |> TestHelpers.expectEqualAnnotatedEl
-                        (AEl
-                            { default
-                                | heightSpec = SFixed 300
-                                , widthSpec = SFixed 200
-                                , width = 200
-                                , height = 300
-                                , children =
-                                    [ AEl
-                                        { default
-                                            | heightSpec = SGrow
-                                            , height = 300
-                                            , layoutDirection = TopToBottom
+                                            , layoutDirection = ld
                                         }
                                     ]
                             }
@@ -161,6 +126,7 @@ suite =
                             { default
                                 | widthSpec = SFixed 1600
                                 , width = 1600
+                                , height = 0
                                 , paddingLeft = 32
                                 , paddingRight = 32
                                 , paddingTop = 32
@@ -172,21 +138,21 @@ suite =
                                             | widthSpec = SFixed 300
                                             , heightSpec = SFixed 300
                                             , width = 300
-                                            , height = 300
+                                            , height = 0
                                         }
                                     , AEl
                                         { default
                                             | widthSpec = SGrow
                                             , heightSpec = SFixed 200
                                             , width = 872
-                                            , height = 200
+                                            , height = 0
                                         }
                                     , AEl
                                         { default
                                             | widthSpec = SFixed 300
                                             , heightSpec = SFixed 300
                                             , width = 300
-                                            , height = 300
+                                            , height = 0
                                         }
                                     ]
                             }
@@ -220,6 +186,7 @@ suite =
                             { default
                                 | widthSpec = SFixed 1600
                                 , width = 1600
+                                , height = 0
                                 , paddingLeft = 32
                                 , paddingRight = 32
                                 , paddingTop = 32
@@ -231,7 +198,7 @@ suite =
                                             | widthSpec = SFixed 300
                                             , heightSpec = SFixed 300
                                             , width = 300
-                                            , height = 300
+                                            , height = 0
                                         }
                                     , AEl
                                         { default
@@ -245,7 +212,7 @@ suite =
                                             | widthSpec = SFixed 300
                                             , heightSpec = SFixed 300
                                             , width = 300
-                                            , height = 300
+                                            , height = 0
                                         }
                                     ]
                             }
@@ -281,11 +248,114 @@ suite =
                                                     { default
                                                         | widthSpec = SFit
                                                         , heightSpec = SFit
-                                                        , width = 0
-                                                        , height = 0
+                                                        , width = 5 * Text.charWidth
+                                                        , height = 1 * Text.charHeight
                                                         , text = Just "Title"
                                                     }
                                                 ]
+                                        }
+                                    ]
+                            }
+                        )
+        , Test.test "regression - part of holy grail - TB root, LR child not growing properly" <|
+            \() ->
+                Container
+                    [ LayoutDirection TopToBottom
+                    , Width (Grow [])
+                    , Height (Grow [])
+                    ]
+                    [ Container
+                        [ LayoutDirection LeftToRight
+                        , Width (Grow [])
+                        ]
+                        [ Container
+                            [ Width (Grow []) ]
+                            [ Text [] "TitleX" ]
+                        , Container
+                            []
+                            [ Text [] "Login" ]
+                        ]
+                    ]
+                    |> run
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | layoutDirection = TopToBottom
+                                , width = 640
+                                , height = 0
+                                , widthSpec = SGrow
+                                , heightSpec = SGrow
+                                , children =
+                                    [ AEl
+                                        { default
+                                            | width = 640
+                                            , height = 0
+                                            , widthSpec = SGrow
+                                            , children =
+                                                [ AEl
+                                                    { default
+                                                        | width = 610
+                                                        , height = 0
+                                                        , widthSpec = SGrow
+                                                        , children =
+                                                            [ AEl
+                                                                { default
+                                                                    | width = 36
+                                                                    , height = 8
+                                                                    , text = Just "TitleX"
+                                                                }
+                                                            ]
+                                                    }
+                                                , AEl
+                                                    { default
+                                                        | width = 30
+                                                        , height = 0
+                                                        , children =
+                                                            [ AEl
+                                                                { default
+                                                                    | width = 30
+                                                                    , height = 8
+                                                                    , text = Just "Login"
+                                                                }
+                                                            ]
+                                                    }
+                                                ]
+                                        }
+                                    ]
+                            }
+                        )
+        , Test.test "Regression - negative width" <|
+            \() ->
+                Container
+                    [ LayoutDirection TopToBottom ]
+                    [ Container
+                        [ Width (Grow [])
+                        , Padding 0 0 0 0
+                        , Padding 0 0 0 0
+                        ]
+                        []
+                    , Container [ Padding 0 0 0 1 ] []
+                    , Text [] " "
+                    ]
+                    |> run
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | width = 1 * Text.charWidth
+                                , height = 0
+                                , layoutDirection = TopToBottom
+                                , children =
+                                    [ AEl { default | widthSpec = SGrow }
+                                    , AEl
+                                        { default
+                                            | paddingLeft = 1
+                                            , width = 1
+                                        }
+                                    , AEl
+                                        { default
+                                            | text = Just " "
+                                            , width = 1 * Text.charWidth
+                                            , height = 1 * Text.charHeight
                                         }
                                     ]
                             }

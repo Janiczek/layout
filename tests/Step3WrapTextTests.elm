@@ -4,19 +4,20 @@ import El exposing (..)
 import Expect
 import Fuzz
 import Step0Annotate as Step0
-import Step1FitSizingAlong as Step1
-import Step2GrowShrinkSizingAlong as Step2
-import Step3WrapText as Step3 exposing (charHeight, charWidth)
+import Step1FitSizingWidths as Step1
+import Step2GrowShrinkSizingWidths as Step2
+import Step3WrapText as Step3
 import Test exposing (Test)
 import TestHelpers exposing (default)
+import Text
 
 
 run : El -> AnnotatedEl
 run el =
     el
         |> Step0.annotate
-        |> Step1.fitSizingAlong
-        |> Step2.growShrinkSizingAlong
+        |> Step1.fitSizingWidths
+        |> Step2.growShrinkSizingWidths
             { layoutWidth = 640
             , layoutHeight = 480
             }
@@ -35,13 +36,13 @@ suite =
                     |> TestHelpers.expectEqualAnnotatedEl
                         (AEl
                             { default
-                                | width = 5 * charWidth
+                                | width = 5 * Text.charWidth
                                 , height = 0
                                 , children =
                                     [ AEl
                                         { default
-                                            | width = 5 * charWidth
-                                            , height = 1 * charHeight
+                                            | width = 5 * Text.charWidth
+                                            , height = 1 * Text.charHeight
                                             , text = Just "Hello"
                                         }
                                     ]
@@ -88,8 +89,8 @@ suite =
                                 , children =
                                     [ AEl
                                         { default
-                                            | width = 5 * charWidth
-                                            , height = 1 * charHeight
+                                            | width = 5 * Text.charWidth
+                                            , height = 1 * Text.charHeight
                                             , text = Just "Hello"
                                         }
                                     ]
@@ -108,12 +109,12 @@ suite =
                     |> TestHelpers.expectEqualAnnotatedEl
                         (AEl
                             { default
-                                | width = String.length text * charWidth
+                                | width = String.length text * Text.charWidth
                                 , children =
                                     [ AEl
                                         { default
-                                            | width = String.length text * charWidth
-                                            , height = 1 * charHeight
+                                            | width = String.length text * Text.charWidth
+                                            , height = 1 * Text.charHeight
                                             , text = Just text
                                         }
                                     ]
@@ -126,19 +127,19 @@ suite =
                         "Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello"
                 in
                 Container
-                    [ Width (Fixed (60 * charWidth)) ]
+                    [ Width (Fixed (60 * Text.charWidth)) ]
                     [ Text [] text ]
                     |> run
                     |> TestHelpers.expectEqualAnnotatedEl
                         (AEl
                             { default
-                                | widthSpec = SFixed (60 * charWidth)
-                                , width = 60 * charWidth
+                                | widthSpec = SFixed (60 * Text.charWidth)
+                                , width = 60 * Text.charWidth
                                 , children =
                                     [ AEl
                                         { default
-                                            | width = 60 * charWidth
-                                            , height = 2 * charHeight
+                                            | width = 60 * Text.charWidth
+                                            , height = 2 * Text.charHeight
                                             , text =
                                                 [ "Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello "
                                                 , "Hello Hello Hello Hello Hello"
@@ -156,19 +157,19 @@ suite =
                         "Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello"
                 in
                 Container
-                    [ Width (Fixed (61 * charWidth)) ]
+                    [ Width (Fixed (61 * Text.charWidth)) ]
                     [ Text [] text ]
                     |> run
                     |> TestHelpers.expectEqualAnnotatedEl
                         (AEl
                             { default
-                                | widthSpec = SFixed (61 * charWidth)
-                                , width = 61 * charWidth
+                                | widthSpec = SFixed (61 * Text.charWidth)
+                                , width = 61 * Text.charWidth
                                 , children =
                                     [ AEl
                                         { default
-                                            | width = 61 * charWidth
-                                            , height = 2 * charHeight
+                                            | width = 61 * Text.charWidth
+                                            , height = 2 * Text.charHeight
                                             , text =
                                                 [ "Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello H"
                                                 , "ello Hello Hello Hello Hello"
@@ -198,13 +199,13 @@ suite =
                         (AEl
                             { default
                                 | widthSpec = SFit
-                                , width = 59 * charWidth
+                                , width = 59 * Text.charWidth
                                 , height = 0
                                 , children =
                                     [ AEl
                                         { default
-                                            | width = 59 * charWidth
-                                            , height = 3 * charHeight
+                                            | width = 59 * Text.charWidth
+                                            , height = 3 * Text.charHeight
                                             , text = Just text
                                         }
                                     ]
@@ -222,19 +223,19 @@ suite =
                             |> String.join "\n"
                 in
                 Container
-                    [ Width (Fixed (31 * charWidth)) ]
+                    [ Width (Fixed (31 * Text.charWidth)) ]
                     [ Text [] text ]
                     |> run
                     |> TestHelpers.expectEqualAnnotatedEl
                         (AEl
                             { default
-                                | widthSpec = SFixed (31 * charWidth)
-                                , width = 31 * charWidth
+                                | widthSpec = SFixed (31 * Text.charWidth)
+                                , width = 31 * Text.charWidth
                                 , children =
                                     [ AEl
                                         { default
-                                            | width = 31 * charWidth
-                                            , height = 5 * charHeight
+                                            | width = 31 * Text.charWidth
+                                            , height = 5 * Text.charHeight
                                             , text =
                                                 [ "Hello Hello Hello Hello Hello H"
                                                 , "ello Hello Hello Hello Hello"
@@ -267,17 +268,17 @@ suite =
                                 | widthSpec = SGrow
                                 , heightSpec = SFixed 100
                                 , width = 640
-                                , height = 100
+                                , height = 0
                                 , children =
                                     [ AEl
                                         { default
-                                            | width = 5 * charWidth
+                                            | width = 5 * Text.charWidth
                                             , height = 0
                                             , children =
                                                 [ AEl
                                                     { default
-                                                        | width = 5 * charWidth
-                                                        , height = 1 * charHeight
+                                                        | width = 5 * Text.charWidth
+                                                        , height = 1 * Text.charHeight
                                                         , text = Just "Hello"
                                                     }
                                                 ]

@@ -5,14 +5,15 @@ import Expect
 import Fuzz
 import Log
 import Step0Annotate as Step0
-import Step1FitSizingAlong as Step1
-import Step2GrowShrinkSizingAlong as Step2
-import Step3WrapText as Step3 exposing (charHeight, charWidth)
-import Step4FitSizingAcross as Step4
-import Step5GrowShrinkSizingAcross as Step5
+import Step1FitSizingWidths as Step1
+import Step2GrowShrinkSizingWidths as Step2
+import Step3WrapText as Step3
+import Step4FitSizingHeights as Step4
+import Step5GrowShrinkSizingHeights as Step5
 import Step6PositionAndAlign as Step6
 import Test exposing (Test)
 import TestHelpers exposing (default)
+import Text
 
 
 config : Config
@@ -26,11 +27,11 @@ run : El -> AnnotatedEl
 run el =
     el
         |> Step0.annotate
-        |> Step1.fitSizingAlong
-        |> Step2.growShrinkSizingAlong config
+        |> Step1.fitSizingWidths
+        |> Step2.growShrinkSizingWidths config
         |> Step3.wrapText
-        |> Step4.fitSizingAcross
-        |> Step5.growShrinkSizingAcross config
+        |> Step4.fitSizingHeights
+        |> Step5.growShrinkSizingHeights config
         |> Step6.positionAndAlign
 
 
@@ -94,4 +95,418 @@ suite =
                         [ .x >> Expect.equal 0
                         , .y >> Expect.equal 0
                         ]
+        , Test.test "Child gap doesn't play role when 0 children - LR" <|
+            \() ->
+                Container
+                    [ LayoutDirection LeftToRight
+                    , ChildGap 3
+                    ]
+                    []
+                    |> run
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | layoutDirection = LeftToRight
+                                , x = 0
+                                , y = 0
+                                , width = 0
+                                , height = 0
+                                , childGap = 3
+                                , children = []
+                            }
+                        )
+        , Test.test "Child gap doesn't play role when 0 children - TB" <|
+            \() ->
+                Container
+                    [ LayoutDirection TopToBottom
+                    , ChildGap 3
+                    ]
+                    []
+                    |> run
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | layoutDirection = TopToBottom
+                                , x = 0
+                                , y = 0
+                                , width = 0
+                                , height = 0
+                                , childGap = 3
+                                , children = []
+                            }
+                        )
+        , Test.test "Child gap doesn't play role when 1 child - LR" <|
+            \() ->
+                Container
+                    [ LayoutDirection LeftToRight
+                    , ChildGap 3
+                    ]
+                    [ Text [] "Child 1" ]
+                    |> run
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | layoutDirection = LeftToRight
+                                , x = 0
+                                , y = 0
+                                , width = 7 * Text.charWidth
+                                , height = 1 * Text.charHeight
+                                , childGap = 3
+                                , children =
+                                    [ AEl
+                                        { default
+                                            | width = 7 * Text.charWidth
+                                            , height = 1 * Text.charHeight
+                                            , x = 0
+                                            , y = 0
+                                            , text = Just "Child 1"
+                                        }
+                                    ]
+                            }
+                        )
+        , Test.test "Child gap doesn't play role when 1 child - TB" <|
+            \() ->
+                Container
+                    [ LayoutDirection TopToBottom
+                    , ChildGap 3
+                    ]
+                    [ Text [] "Child 1" ]
+                    |> run
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | layoutDirection = TopToBottom
+                                , x = 0
+                                , y = 0
+                                , width = 7 * Text.charWidth
+                                , height = 1 * Text.charHeight
+                                , childGap = 3
+                                , children =
+                                    [ AEl
+                                        { default
+                                            | width = 7 * Text.charWidth
+                                            , height = 1 * Text.charHeight
+                                            , x = 0
+                                            , y = 0
+                                            , text = Just "Child 1"
+                                        }
+                                    ]
+                            }
+                        )
+        , Test.test "Child gap plays role when 2 children - LR" <|
+            \() ->
+                Container
+                    [ LayoutDirection LeftToRight
+                    , ChildGap 3
+                    ]
+                    [ Text [] "Child 1"
+                    , Text [] "Child 2"
+                    ]
+                    |> run
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | layoutDirection = LeftToRight
+                                , x = 0
+                                , y = 0
+                                , width = 14 * Text.charWidth + 3
+                                , height = 1 * Text.charHeight
+                                , childGap = 3
+                                , children =
+                                    [ AEl
+                                        { default
+                                            | width = 7 * Text.charWidth
+                                            , height = 1 * Text.charHeight
+                                            , x = 0
+                                            , y = 0
+                                            , text = Just "Child 1"
+                                        }
+                                    , AEl
+                                        { default
+                                            | width = 7 * Text.charWidth
+                                            , height = 1 * Text.charHeight
+                                            , x = 7 * Text.charWidth + 3
+                                            , y = 0
+                                            , text = Just "Child 2"
+                                        }
+                                    ]
+                            }
+                        )
+        , Test.test "Child gap plays role when 2 children - TB" <|
+            \() ->
+                Container
+                    [ LayoutDirection TopToBottom
+                    , ChildGap 3
+                    ]
+                    [ Text [] "Child 1"
+                    , Text [] "Child 2"
+                    ]
+                    |> run
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | layoutDirection = TopToBottom
+                                , x = 0
+                                , y = 0
+                                , width = 7 * Text.charWidth
+                                , height = 2 * Text.charHeight + 3
+                                , childGap = 3
+                                , children =
+                                    [ AEl
+                                        { default
+                                            | width = 7 * Text.charWidth
+                                            , height = 1 * Text.charHeight
+                                            , x = 0
+                                            , y = 0
+                                            , text = Just "Child 1"
+                                        }
+                                    , AEl
+                                        { default
+                                            | width = 7 * Text.charWidth
+                                            , height = 1 * Text.charHeight
+                                            , x = 0
+                                            , y = 1 * Text.charHeight + 3
+                                            , text = Just "Child 2"
+                                        }
+                                    ]
+                            }
+                        )
+        , Test.test "Child gap plays role when 3 children - LR" <|
+            \() ->
+                Container
+                    [ LayoutDirection LeftToRight
+                    , ChildGap 3
+                    ]
+                    [ Text [] "Child 1"
+                    , Text [] "Child 2"
+                    , Text [] "Child 3"
+                    ]
+                    |> run
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | layoutDirection = LeftToRight
+                                , x = 0
+                                , y = 0
+                                , width = 21 * Text.charWidth + 6
+                                , height = 1 * Text.charHeight
+                                , childGap = 3
+                                , children =
+                                    [ AEl
+                                        { default
+                                            | width = 7 * Text.charWidth
+                                            , height = 1 * Text.charHeight
+                                            , x = 0
+                                            , y = 0
+                                            , text = Just "Child 1"
+                                        }
+                                    , AEl
+                                        { default
+                                            | width = 7 * Text.charWidth
+                                            , height = 1 * Text.charHeight
+                                            , x = 7 * Text.charWidth + 3
+                                            , y = 0
+                                            , text = Just "Child 2"
+                                        }
+                                    , AEl
+                                        { default
+                                            | width = 7 * Text.charWidth
+                                            , height = 1 * Text.charHeight
+                                            , x = 14 * Text.charWidth + 6
+                                            , y = 0
+                                            , text = Just "Child 3"
+                                        }
+                                    ]
+                            }
+                        )
+        , Test.test "Child gap plays role when 3 children - TB" <|
+            \() ->
+                Container
+                    [ LayoutDirection TopToBottom
+                    , ChildGap 3
+                    ]
+                    [ Text [] "Child 1"
+                    , Text [] "Child 2"
+                    , Text [] "Child 3"
+                    ]
+                    |> run
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | layoutDirection = TopToBottom
+                                , x = 0
+                                , y = 0
+                                , width = 7 * Text.charWidth
+                                , height = 3 * Text.charHeight + 6
+                                , childGap = 3
+                                , children =
+                                    [ AEl
+                                        { default
+                                            | width = 7 * Text.charWidth
+                                            , height = 1 * Text.charHeight
+                                            , x = 0
+                                            , y = 0
+                                            , text = Just "Child 1"
+                                        }
+                                    , AEl
+                                        { default
+                                            | width = 7 * Text.charWidth
+                                            , height = 1 * Text.charHeight
+                                            , x = 0
+                                            , y = 1 * Text.charHeight + 3
+                                            , text = Just "Child 2"
+                                        }
+                                    , AEl
+                                        { default
+                                            | width = 7 * Text.charWidth
+                                            , height = 1 * Text.charHeight
+                                            , x = 0
+                                            , y = 2 * Text.charHeight + 6
+                                            , text = Just "Child 3"
+                                        }
+                                    ]
+                            }
+                        )
+        , Test.test "Padding plays role when 0 children - LR" <|
+            \() ->
+                Container
+                    [ LayoutDirection LeftToRight
+                    , Padding 1 2 3 4
+                    ]
+                    []
+                    |> run
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | layoutDirection = LeftToRight
+                                , x = 0
+                                , y = 0
+                                , width = 6
+                                , height = 4
+                                , paddingTop = 1
+                                , paddingRight = 2
+                                , paddingBottom = 3
+                                , paddingLeft = 4
+                                , children = []
+                            }
+                        )
+        , Test.test "Padding plays role when 0 children - TB" <|
+            \() ->
+                Container
+                    [ LayoutDirection TopToBottom
+                    , Padding 1 2 3 4
+                    ]
+                    []
+                    |> run
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | layoutDirection = TopToBottom
+                                , x = 0
+                                , y = 0
+                                , width = 6
+                                , height = 4
+                                , paddingTop = 1
+                                , paddingRight = 2
+                                , paddingBottom = 3
+                                , paddingLeft = 4
+                                , children = []
+                            }
+                        )
+        , Test.test "Padding plays role when 1 child - LR" <|
+            \() ->
+                Container
+                    [ LayoutDirection LeftToRight
+                    , Padding 1 2 3 4
+                    ]
+                    [ Text [] "Abc" ]
+                    |> run
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | layoutDirection = LeftToRight
+                                , x = 0
+                                , y = 0
+                                , width = 6 + 3 * Text.charWidth
+                                , height = 4 + 1 * Text.charHeight
+                                , paddingTop = 1
+                                , paddingRight = 2
+                                , paddingBottom = 3
+                                , paddingLeft = 4
+                                , children =
+                                    [ AEl
+                                        { default
+                                            | x = 4
+                                            , y = 1
+                                            , width = 3 * Text.charWidth
+                                            , height = 1 * Text.charHeight
+                                            , text = Just "Abc"
+                                        }
+                                    ]
+                            }
+                        )
+        , Test.test "Padding and child gap - LR" <|
+            \() ->
+                Container
+                    [ LayoutDirection LeftToRight
+                    , ChildGap 3
+                    , Padding 1 2 3 4
+                    ]
+                    [ Container [ Width (Fixed 50), Height (Fixed 70) ] []
+                    , Container [ Width (Fixed 60), Height (Fixed 70) ] []
+                    , Container [ Width (Fixed 70), Height (Fixed 70) ] []
+                    ]
+                    |> run
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | layoutDirection = LeftToRight
+                                , x = 0
+                                , y = 0
+                                , width = 50 + 60 + 70 + 3 + 3 + 2 + 4
+                                , height = 70 + 1 + 3
+                                , paddingTop = 1
+                                , paddingRight = 2
+                                , paddingBottom = 3
+                                , paddingLeft = 4
+                                , childGap = 3
+                                , children =
+                                    [ AEl { default | x = 4, y = 1, width = 50, widthSpec = SFixed 50, height = 70, heightSpec = SFixed 70 }
+                                    , AEl { default | x = 57, y = 1, width = 60, widthSpec = SFixed 60, height = 70, heightSpec = SFixed 70 }
+                                    , AEl { default | x = 120, y = 1, width = 70, widthSpec = SFixed 70, height = 70, heightSpec = SFixed 70 }
+                                    ]
+                            }
+                        )
+        , Test.test "Padding and child gap - TB" <|
+            \() ->
+                Container
+                    [ LayoutDirection TopToBottom
+                    , ChildGap 3
+                    , Padding 1 2 3 4
+                    ]
+                    [ Container [ Width (Fixed 50), Height (Fixed 70) ] []
+                    , Container [ Width (Fixed 50), Height (Fixed 80) ] []
+                    , Container [ Width (Fixed 50), Height (Fixed 90) ] []
+                    ]
+                    |> run
+                    |> TestHelpers.expectEqualAnnotatedEl
+                        (AEl
+                            { default
+                                | layoutDirection = TopToBottom
+                                , x = 0
+                                , y = 0
+                                , width = 50 + 2 + 4
+                                , height = 70 + 80 + 90 + 3 + 3 + 1 + 3
+                                , paddingTop = 1
+                                , paddingRight = 2
+                                , paddingBottom = 3
+                                , paddingLeft = 4
+                                , childGap = 3
+                                , children =
+                                    [ AEl { default | x = 4, y = 1, width = 50, widthSpec = SFixed 50, height = 70, heightSpec = SFixed 70 }
+                                    , AEl { default | x = 4, y = 74, width = 50, widthSpec = SFixed 50, height = 80, heightSpec = SFixed 80 }
+                                    , AEl { default | x = 4, y = 157, width = 50, widthSpec = SFixed 50, height = 90, heightSpec = SFixed 90 }
+                                    ]
+                            }
+                        )
         ]
