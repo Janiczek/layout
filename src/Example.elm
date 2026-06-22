@@ -39,7 +39,9 @@ holyGrail =
             ]
             [ -- title
               Container
-                [ Width (Grow []) ]
+                [ Width (Grow [])
+                , HorizAlign Left
+                ]
                 [ Text [] "Title" ]
             , -- login
               Text [] "Login"
@@ -54,6 +56,7 @@ holyGrail =
               Container
                 [ LayoutDirection TopToBottom
                 , Height (Grow [])
+                , HorizAlign Left
                 , Padding 8 8 8 8
                 , ChildGap 16
                 , BgColor LightPurple

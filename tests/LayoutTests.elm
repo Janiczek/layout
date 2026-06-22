@@ -174,7 +174,9 @@ suite =
                         ]
                         [ -- title
                           Container
-                            [ Width (Grow []) ]
+                            [ Width (Grow [])
+                            , HorizAlign Left
+                            ]
                             [ Text [] "Title" ]
                         , -- login
                           Text [] "Login"
@@ -188,6 +190,7 @@ suite =
                         [ -- left rail
                           Container
                             [ LayoutDirection TopToBottom
+                            , HorizAlign Left
                             , Height (Grow [])
                             , Padding 8 8 8 8
                             , ChildGap 16
@@ -258,7 +261,7 @@ suite =
                                       AEl
                                         { default
                                             | width = 640
-                                            , height = 24
+                                            , height = 1 * Text.charHeight + 8 + 8
                                             , widthSpec = SGrow
                                             , paddingTop = 8
                                             , paddingRight = 8
@@ -271,7 +274,8 @@ suite =
                                                   AEl
                                                     { default
                                                         | widthSpec = SGrow
-                                                        , width = 578
+                                                        , horizAlign = Left
+                                                        , width = 640 - 5 * Text.charWidth - 8 - 8 - 16
                                                         , height = 1 * Text.charHeight
                                                         , x = 8
                                                         , y = 8
@@ -291,7 +295,7 @@ suite =
                                                     { default
                                                         | width = 5 * Text.charWidth
                                                         , height = 1 * Text.charHeight
-                                                        , x = 602
+                                                        , x = 640 - 5 * Text.charWidth - 8
                                                         , y = 8
                                                         , text = Just "Login"
                                                     }
@@ -307,7 +311,9 @@ suite =
                                                   AEl
                                                     { default
                                                         | layoutDirection = TopToBottom
+                                                        , horizAlign = Left
                                                         , heightSpec = SGrow
+                                                        , width = 10 * Text.charWidth + 8 + 8
                                                         , paddingTop = 8
                                                         , paddingRight = 8
                                                         , paddingBottom = 8
@@ -321,16 +327,16 @@ suite =
                                                                     | heightSpec = SGrow
                                                                     , childGap = 8
                                                                     , children =
-                                                                        [ AEl { default | text = Just "Home" }
-                                                                        , AEl { default | text = Just "About me" }
-                                                                        , AEl { default | text = Just "Downloads" }
+                                                                        [ AEl { default | height = 1 * Text.charHeight, width = 4 * Text.charWidth, text = Just "Home" }
+                                                                        , AEl { default | height = 1 * Text.charHeight, width = 8 * Text.charWidth, text = Just "About me" }
+                                                                        , AEl { default | height = 1 * Text.charHeight, width = 9 * Text.charWidth, text = Just "Downloads" }
                                                                         ]
                                                                 }
                                                             , -- Bottom section of left rail
                                                               AEl
                                                                 { default
                                                                     | children =
-                                                                        [ AEl { default | text = Just "Admin link" }
+                                                                        [ AEl { default | height = 1 * Text.charHeight, width = 10 * Text.charWidth, text = Just "Admin link" }
                                                                         ]
                                                                 }
                                                             ]
@@ -348,9 +354,9 @@ suite =
                                                         , childGap = 8
                                                         , bgColor = Just Pink
                                                         , children =
-                                                            [ AEl { default | text = Just "Heading!" }
-                                                            , AEl { default | text = Just "Some text" }
-                                                            , AEl { default | text = Just "Some more text here." }
+                                                            [ AEl { default | height = 1 * Text.charHeight, width = 8 * Text.charWidth, text = Just "Heading!" }
+                                                            , AEl { default | height = 1 * Text.charHeight, width = 9 * Text.charWidth, text = Just "Some text" }
+                                                            , AEl { default | height = 1 * Text.charHeight, width = 20 * Text.charWidth, text = Just "Some more text here." }
                                                             ]
                                                     }
                                                 , -- right rail
@@ -365,9 +371,9 @@ suite =
                                                         , paddingLeft = 8
                                                         , bgColor = Just LightPurple
                                                         , children =
-                                                            [ AEl { default | text = Just "On this page" }
-                                                            , AEl { default | text = Just "Tags" }
-                                                            , AEl { default | text = Just "Reading time" }
+                                                            [ AEl { default | height = 1 * Text.charHeight, width = 12 * Text.charWidth, text = Just "On this page" }
+                                                            , AEl { default | height = 1 * Text.charHeight, width = 4 * Text.charWidth, text = Just "Tags" }
+                                                            , AEl { default | height = 1 * Text.charHeight, width = 12 * Text.charWidth, text = Just "Reading time" }
                                                             ]
                                                     }
                                                 ]
@@ -376,11 +382,11 @@ suite =
                                       AEl
                                         { default
                                             | width = 640
-                                            , height = 24 -- 8 + 16
+                                            , height = 1 * Text.charHeight + 8 + 8
                                             , x = 0
                                             , -- in principle, viewport height minus this element's height (it sticks to the bottom),
                                               -- even though the layout algo will find this number via additive algorithm
-                                              y = 456
+                                              y = 640 - (1 * Text.charHeight + 8 + 8)
                                             , bgColor = Just Purple
                                             , widthSpec = SGrow
                                             , paddingTop = 8
@@ -394,7 +400,7 @@ suite =
                                                     { default
                                                         | width = 11 * Text.charWidth
                                                         , height = 1 * Text.charHeight
-                                                        , x = 287 -- 640/2 - 66/2
+                                                        , x = 640 // 2 - (11 * Text.charWidth // 2)
                                                         , y = 464 -- 456 (container y) + 8 (container padding top)
                                                         , text = Just "(c) 2026 MJ"
                                                     }

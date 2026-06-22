@@ -197,11 +197,13 @@ foldPostOrder step acc ((AEl ael) as ael_) =
 preOrder : AnnotatedEl -> List AnnotatedEl
 preOrder el =
     foldPreOrder (::) [] el
+        |> List.reverse
 
 
 postOrder : AnnotatedEl -> List AnnotatedEl
 postOrder el =
     foldPostOrder (::) [] el
+        |> List.reverse
 
 
 {-| Run function on every AnnotatedEl in this tree.

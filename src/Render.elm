@@ -16,7 +16,7 @@ import Json.Decode exposing (Value)
 import Math.Matrix4 as Mat4 exposing (Mat4)
 import Math.Vector3 as Vec3 exposing (Vec3)
 import Render.Debug
-import Render.HtmlTranslate
+import Render.HtmlAbsolute
 import WebGL exposing (Mesh, Shader)
 
 
@@ -37,12 +37,12 @@ htmlCss ael =
 
 htmlTranslate : AnnotatedEl -> Html msg
 htmlTranslate ael =
-    Render.HtmlTranslate.render ael
+    Render.HtmlAbsolute.render ael
 
 
 htmlAbsolute : AnnotatedEl -> Html msg
 htmlAbsolute ael =
-    Debug.todo "htmlAbsolute"
+    Render.HtmlAbsolute.render ael
 
 
 htmlGrid : AnnotatedEl -> Html msg
